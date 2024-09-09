@@ -1,0 +1,7 @@
+Creation du fichier migration : 
+
+dotnet-ef migrations add CrationDBContexte --project TD1_code (Attention CrationDBContexte n'est pas le nom du fichier )
+
+si il trouve plusieur DBcotext : dotnet-ef migrations add CrationDBContexte --project TD1_code --context DBContexte
+
+envoie les tables dans la base : dotnet-ef database update CrationDBContexte --project TD1_code --context DBContexte

@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using TD1_code.Models.DataManager;
+using TD1_code.Models.EntityFramework;
+using TD1_code.Respository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<DBContexte>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DBContexte")));
+
+builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitManager>();
+builder.Services.AddScoped<IDataRepository<Marque>, MarqueManager>();
+builder.Services.AddScoped<IDataRepository<Produit>, ProduitManager>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -18,7 +28,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-builder.Services.AddDbContext<DbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DBContexte")));
+
+
 
 app.UseHttpsRedirection();
 
