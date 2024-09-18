@@ -66,7 +66,7 @@ namespace TD1_code.Controllers.Tests
             CollectionAssert.AreEqual(expected, res.Value.ToList(), "Les listes ne sont pas identiques");
         }
         /// <summary>
-        /// Test GetCarteBancaireById 
+        /// Test GetMarqueById 
         /// </summary>
 
         [TestMethod()]
@@ -112,28 +112,28 @@ namespace TD1_code.Controllers.Tests
 
 
         /// <summary>
-        /// Test PutCarteBancaireTest 
+        /// Test PutMarqueTest 
         /// </summary>
         [TestMethod()]
-        public void PutCarteBancaireTest()
+        public void PutMarqueTest()
         {
             // Arrange
-            CarteBancaire userAtester = context.CartesBancaires.Find(1);
+            Marque userAtester = context.CartesBancaires.Find(1);
 
             // Act
-            var res = controller.PutCarteBancaire(1, userAtester);
+            var res = controller.PutMarque(1, userAtester);
 
             // Arrange
-            CarteBancaire nouvellecarte = context.CartesBancaires.Find(1);
+            Marque nouvellecarte = context.CartesBancaires.Find(1);
             Assert.AreEqual(userAtester, nouvellecarte);
         }
 
         [TestMethod]
-        public void PutCarteBancaireTestAvecMoq()
+        public void PutMarqueTestAvecMoq()
         {
 
             // Arrange
-            CarteBancaire carteToUpdate = new CarteBancaire
+            Marque carteToUpdate = new Marque
             {
                 IdCb = 2000,
                 NomCarte = "NUNES EMILIO Ricardo ",
@@ -143,7 +143,7 @@ namespace TD1_code.Controllers.Tests
                 CryptoCb = "093",
 
             };
-            CarteBancaire updatedCarte = new CarteBancaire
+            Marque updatedCarte = new Marque
             {
                 IdCb = 21000,
                 NomCarte = "NUNES  ",
@@ -153,15 +153,15 @@ namespace TD1_code.Controllers.Tests
                 CryptoCb = "093",
 
             };
-            var mockRepository = new Mock<IDataRepository<CarteBancaire>>();
+            var mockRepository = new Mock<IDataRepository<Marque>>();
             mockRepository.Setup(repo => repo.GetByIdAsync(21000)).ReturnsAsync(carteToUpdate);
             mockRepository.Setup(repo => repo.UpdateAsync(carteToUpdate, updatedCarte)).Returns(Task.CompletedTask);
 
 
-            var controller = new CarteBancaireController(mockRepository.Object);
+            var controller = new MarqueController(mockRepository.Object);
 
             // Act
-            var result = controller.PutCarteBancaire(21000, updatedCarte).Result;
+            var result = controller.PutMarque(21000, updatedCarte).Result;
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "La réponse n'est pas du type attendu NoContentResult");
@@ -172,11 +172,11 @@ namespace TD1_code.Controllers.Tests
         /// </summary>
         /// 
         [TestMethod()]
-        public void PostCarteBancaireTest()
+        public void PostMarqueTest()
         {
             //// Arrange
 
-            //CarteBancaire carte = new CarteBancaire
+            //Marque carte = new Marque
             //{
             //    IdCb = 100,
             //    NomCarte = "NUNES EMILIO Ricardo ",
@@ -188,11 +188,11 @@ namespace TD1_code.Controllers.Tests
             //};
 
             //// Act
-            //var result = controller.PostCarteBancaire(carte).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre l’ajout
+            //var result = controller.PostMarque(carte).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre l’ajout
 
             //// Assert
             //// On récupère l'utilisateur créé directement dans la BD grace à son mail unique
-            //CarteBancaire? carteRecupere = context.CartesBancaires
+            //Marque? carteRecupere = context.CartesBancaires
             //    .Where(u => u.IdCb == carte.IdCb)
             //    .FirstOrDefault();
 
@@ -203,16 +203,16 @@ namespace TD1_code.Controllers.Tests
         }
 
         [TestMethod]
-        public void PostCarteBancaireTest_Mok()
+        public void PostMarqueTest_Mok()
         {
             // Arrange
-            var mockRepository = new Mock<IDataRepository<CarteBancaire>>();
-            var userController = new CarteBancaireController(mockRepository.Object);
+            var mockRepository = new Mock<IDataRepository<Marque>>();
+            var userController = new MarqueController(mockRepository.Object);
 
 
 
             // Arrange
-            CarteBancaire catre = new CarteBancaire
+            Marque catre = new Marque
             {
                 IdCb = 1,
                 NomCarte = "NUNES EMILIO Ricardo ",
@@ -223,14 +223,14 @@ namespace TD1_code.Controllers.Tests
 
             };
             // Act
-            var actionResult = userController.PostCarteBancaire(catre).Result;
+            var actionResult = userController.PostMarque(catre).Result;
             // Assert
-            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<CarteBancaire>), "Pas un ActionResult<Utilisateur>");
+            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Marque>), "Pas un ActionResult<Utilisateur>");
             Assert.IsInstanceOfType(actionResult.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
             var result = actionResult.Result as CreatedAtActionResult;
-            Assert.IsInstanceOfType(result.Value, typeof(CarteBancaire), "Pas un Utilisateur");
-            catre.IdCb = ((CarteBancaire)result.Value).IdCb;
-            Assert.AreEqual(catre, (CarteBancaire)result.Value, "Utilisateurs pas identiques");
+            Assert.IsInstanceOfType(result.Value, typeof(Marque), "Pas un Utilisateur");
+            catre.IdCb = ((Marque)result.Value).IdCb;
+            Assert.AreEqual(catre, (Marque)result.Value, "Utilisateurs pas identiques");
         }
 
 
@@ -240,10 +240,10 @@ namespace TD1_code.Controllers.Tests
         /// </summary>
 
         [TestMethod()]
-        public void DeleteCarteBancaireTest()
+        public void DeleteMarqueTest()
         {
             // Arrange
-            CarteBancaire catre = new CarteBancaire
+            Marque catre = new Marque
             {
                 IdCb = 200,
                 NomCarte = "NUNES EMILIO Ricardo ",
@@ -257,17 +257,17 @@ namespace TD1_code.Controllers.Tests
             context.SaveChanges();
 
             // Act
-            CarteBancaire deletedCarte = context.CartesBancaires.FirstOrDefault(u => u.IdCb == catre.IdCb);
-            _ = controller.DeleteCarteBancaire(deletedCarte.IdCb).Result;
+            Marque deletedCarte = context.CartesBancaires.FirstOrDefault(u => u.IdCb == catre.IdCb);
+            _ = controller.DeleteMarque(deletedCarte.IdCb).Result;
 
             // Arrange
-            CarteBancaire res = context.CartesBancaires.FirstOrDefault(u => u.IdCb == catre.IdCb);
+            Marque res = context.CartesBancaires.FirstOrDefault(u => u.IdCb == catre.IdCb);
             Assert.IsNull(res, "utilisateur non supprimé");
         }
 
 
         [TestMethod]
-        public void DeleteCarteBancaireTest_AvecMoq()
+        public void DeleteMarqueTest_AvecMoq()
         {
             ICollection<Acquerir> AcquisC = new List<Acquerir>
             {
@@ -276,7 +276,7 @@ namespace TD1_code.Controllers.Tests
             };
 
             // Arrange
-            CarteBancaire catre = new CarteBancaire
+            Marque catre = new Marque
             {
                 IdCb = 1,
                 NomCarte = "NUNES EMILIO Ricardo ",
@@ -286,11 +286,11 @@ namespace TD1_code.Controllers.Tests
                 CryptoCb = "093",
                 AcquisCB = AcquisC
             };
-            var mockRepository = new Mock<IDataRepository<CarteBancaire>>();
+            var mockRepository = new Mock<IDataRepository<Marque>>();
             mockRepository.Setup(x => x.GetByIdAsync(2).Result).Returns(catre);
-            var userController = new CarteBancaireController(mockRepository.Object);
+            var userController = new MarqueController(mockRepository.Object);
             // Act
-            var actionResult = userController.DeleteCarteBancaire(2).Result;
+            var actionResult = userController.DeleteMarque(2).Result;
             // Assert
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
         }
