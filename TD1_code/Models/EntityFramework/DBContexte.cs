@@ -7,11 +7,12 @@ namespace TD1_code.Models.EntityFramework
 {
     public partial class DBContexte : DbContext
     {
-        public DBContexte()
+        public DBContexte(DbContextOptions<DbContext> options)
         {
         }
 
-        public DBContexte(DbContextOptions<DbContext> options):base(options) { }
+        public DBContexte(DbContextOptions<DBContexte> options)
+            : base(options) { }
         public virtual DbSet<Marque> Marques { get; set; }
         public virtual DbSet<Produit> Produits { get; set; }
         public virtual DbSet<TypeProduit> TypeProduits { get; set; }
@@ -36,7 +37,7 @@ namespace TD1_code.Models.EntityFramework
 
             modelBuilder.Entity<Marque>(entity =>
             {
-                entity.HasKey(e => e.IdMarque).HasName("pk_produit");
+                entity.HasKey(e => e.IdMarque).HasName("pk_produit2");
             });
             modelBuilder.Entity<TypeProduit>(entity =>
             {
@@ -50,7 +51,7 @@ namespace TD1_code.Models.EntityFramework
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Server=localhost;port=5432;Database=SAR_BMW; uid=postgres; password=Ricardo2003@");
+                optionsBuilder.UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
             }
         }
 

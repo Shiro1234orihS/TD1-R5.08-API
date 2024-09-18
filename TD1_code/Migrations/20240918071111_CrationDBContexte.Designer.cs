@@ -11,8 +11,8 @@ using TD1_code.Models.EntityFramework;
 namespace TD1_code.Migrations
 {
     [DbContext(typeof(DBContexte))]
-    [Migration("20240904183550_CreationBDFilmRatings")]
-    partial class CreationBDFilmRatings
+    [Migration("20240918071111_CrationDBContexte")]
+    partial class CrationDBContexte
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -39,7 +39,7 @@ namespace TD1_code.Migrations
                         .HasColumnName("nomMarque");
 
                     b.HasKey("IdMarque")
-                        .HasName("pk_produit");
+                        .HasName("pk_produit2");
 
                     b.ToTable("Marque");
                 });

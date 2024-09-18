@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TD1_code.Migrations
 {
     /// <inheritdoc />
-    public partial class CreationBDFilmRatings : Migration
+    public partial class CrationDBContexte : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,7 @@ namespace TD1_code.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_produit", x => x.idMarque);
+                    table.PrimaryKey("pk_produit2", x => x.idMarque);
                 });
 
             migrationBuilder.CreateTable(

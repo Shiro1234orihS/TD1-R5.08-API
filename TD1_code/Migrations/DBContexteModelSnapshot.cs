@@ -36,7 +36,7 @@ namespace TD1_code.Migrations
                         .HasColumnName("nomMarque");
 
                     b.HasKey("IdMarque")
-                        .HasName("pk_produit");
+                        .HasName("pk_produit2");
 
                     b.ToTable("Marque");
                 });
