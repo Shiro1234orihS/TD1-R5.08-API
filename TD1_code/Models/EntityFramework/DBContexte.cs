@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿  using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TD1_code.Models.EntityFramework;
@@ -51,7 +51,7 @@ namespace TD1_code.Models.EntityFramework
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
+                optionsBuilder.UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
             }
         }
 
