@@ -46,7 +46,7 @@ namespace TD1_code.Controllers
         // PUT: api/Utilisateurs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGammeMoto(int id, Marque marque)
+        public async Task<IActionResult> PutMarque(int id, Marque marque)
         {
             if (id != marque.IdMarque)
             {
@@ -68,7 +68,7 @@ namespace TD1_code.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ActionName("PostMarque")]
-        public async Task<ActionResult<Marque>> PostGammeMoto(Marque marque)
+        public async Task<ActionResult<Marque>> PostMarque(Marque marque)
         {
             if (!ModelState.IsValid)
             {
@@ -81,7 +81,7 @@ namespace TD1_code.Controllers
         // DELETE: api/Utilisateurs/5
         [HttpDelete("{id}")]
         [ActionName("DeleteMarque")]
-        public async Task<IActionResult> DeleteGammeMoto(int id)
+        public async Task<IActionResult> DeleteMarque(int id)
         {
             var marque = await _marque.GetByIdAsync(id);
             if (marque == null)

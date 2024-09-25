@@ -5,24 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TD1_code.Respository;
-using TD1_code.Models;
-using TD1_code.Models.EntityFramework;
-using TD1_code.Models.DataManager;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
+using TD1_code.Models.DataManager;
+using TD1_code.Models.EntityFramework;
+using TD1_code.Respository;
 
 namespace TD1_code.Controllers.Tests
 {
     [TestClass()]
-    public class MarquesControllerTests
+    public class ProduitsControllerTests
     {
         #region Private Fields
         // Déclaration des variables nécessaires pour les tests
-        private MarquesController controller;
+        private ProduitsController controller;
         private DBContexte context;
-        private IDataRepository<Marque> dataRepository;
+        private IDataRepository<Produit> dataRepository;
         #endregion
 
         [TestInitialize]
@@ -30,22 +29,22 @@ namespace TD1_code.Controllers.Tests
         {
             var builder = new DbContextOptionsBuilder<DBContexte>().UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
             DBContexte dbContext = new DBContexte(builder.Options);
-            dataRepository = new MarqueManager(context);
+            dataRepository = new ProduitManager(context);
             // Création du gestionnaire de données et du contrôleur à tester
-            MarquesController controller = new MarquesController(dataRepository);
+            ProduitsController controller = new ProduitsController(dataRepository);
         }
 
-        #region MarquesControllerTest
+        #region ProduitsControllerTest
         [TestMethod()]
-        public void MarquesControllerTest()
+        public void ProduitsControllerTest()
         {
             // Arrange : préparation des données attendues
             var builder = new DbContextOptionsBuilder<DbContext>().UseNpgsql("Server = 51.83.36.122; port = 5432; Database = sa25; uid = sa25; password = 1G1Nxb; SearchPath = bmw");
             context = new DBContexte(builder.Options);
-            dataRepository = new MarqueManager(context);
+            dataRepository = new ProduitManager(context);
 
             // Act : appel de la méthode à tester
-            var option = new MarquesController(dataRepository);
+            var option = new ProduitsController(dataRepository);
 
             // Assert : vérification que les données obtenues correspondent aux données attendues : vérification que les données obtenues correspondent aux données attendues
             Assert.IsNotNull(option, "L'instance de MaClasse ne devrait pas être null.");
@@ -54,63 +53,63 @@ namespace TD1_code.Controllers.Tests
 
 
         [TestMethod]
-        public void GetMarqueByIdTest_AvecMoq()
+        public void GetProduitByIdTest_AvecMoq()
         {
             // Arrange
-            var mockRepository = new Mock<IDataRepository<Marque>>();
+            var mockRepository = new Mock<IDataRepository<Produit>>();
 
-            ICollection<Marque> AcquisC = new List<Marque>
+            ICollection<Produit> AcquisC = new List<Produit>
             {
-                new Marque { /* initialisez les propriétés de l'objet ici */ },
-                new Marque { /* un autre objet Acquerir */ }
+                new Produit { /* initialisez les propriétés de l'objet ici */ },
+                new Produit { /* un autre objet Acquerir */ }
             };
 
 
-            Marque catre = new Marque
+            Produit catre = new Produit
             {
-               IdMarque = 1,
-               NomMarque = "testMoq"
+                IdProduit = 1,
+                NomProduit = "testMoq"
             };
             // Act
             mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(catre);
-            var userController = new MarquesController(mockRepository.Object);
+            var userController = new ProduitsController(mockRepository.Object);
 
-            var actionResult = userController.GetMarqueById(1).Result;
+            var actionResult = userController.GetproduitById(1).Result;
             // Assert
             Assert.IsNotNull(actionResult);
             Assert.IsNotNull(actionResult.Value);
-            Assert.AreEqual(catre, actionResult.Value as Marque);
+            Assert.AreEqual(catre, actionResult.Value as Produit);
         }
 
 
 
 
         [TestMethod]
-        public void PutMarqueTestAvecMoq()
+        public void PutProduitTestAvecMoq()
         {
 
             // Arrange
-            Marque marqueToUpdate = new Marque
+            Produit ProduitToUpdate = new Produit
             {
-               IdMarque = 200,
-               NomMarque = "SVG"
+                IdProduit = 200,
+                NomProduit = "SVG"
 
             };
-            Marque updatedmarque = new Marque
+            Produit updatedProduit = new Produit
             {
-                IdMarque = 201,
-                NomMarque = "Svg"
+                IdProduit = 201,
+                NomProduit = "Svg"
 
             };
-            var mockRepository = new Mock<IDataRepository<Marque>>();
-            mockRepository.Setup(repo => repo.GetByIdAsync(200)).ReturnsAsync(marqueToUpdate);
-            mockRepository.Setup(repo => repo.UpdateAsync(marqueToUpdate, updatedmarque)).Returns(Task.CompletedTask);
+            var mockRepository = new Mock<IDataRepository<Produit>>();
+            mockRepository.Setup(repo => repo.GetByIdAsync(200)).ReturnsAsync(ProduitToUpdate);
+            mockRepository.Setup(repo => repo.UpdateAsync(ProduitToUpdate, updatedProduit)).Returns(Task.CompletedTask);
 
 
-            var controller = new MarquesController(mockRepository.Object);
+            var controller = new ProduitsController(mockRepository.Object);
 
             // Act
-            var result = controller.PutMarque(200, updatedmarque).Result;
+            var result = controller.PutProduit(200, updatedProduit).Result;
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "La réponse n'est pas du type attendu NoContentResult");
@@ -121,76 +120,74 @@ namespace TD1_code.Controllers.Tests
         /// </summary>
         /// 
         [TestMethod()]
-        public void PostMarqueTest()
+        public void PostProduitTest()
         {
             //// Arrange
 
-            //Marque carte = new Marque
+            //Produit carte = new Produit
             //{
-            //    IdMarque = 100,
+            //    IdProduit = 100,
             //    NomCarte = "NUNES EMILIO Ricardo ",
             //};
 
             //// Act
-            //var result = controller.PostMarque(carte).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre l’ajout
+            //var result = controller.PostProduit(carte).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre l’ajout
 
             //// Assert
             //// On récupère l'utilisateur créé directement dans la BD grace à son mail unique
-            //Marque? carteRecupere = context.Marques
-            //    .Where(u => u.IdMarque == carte.IdMarque)
+            //Produit? carteRecupere = context.Produits
+            //    .Where(u => u.IdProduit == carte.IdProduit)
             //    .FirstOrDefault();
 
             //// On ne connait pas l'ID de l’utilisateur envoyé car numéro automatique.
             //// Du coup, on récupère l'ID de celui récupéré et on compare ensuite les 2 users
-            //carte.IdMarque = carteRecupere.IdMarque;
+            //carte.IdProduit = carteRecupere.IdProduit;
             //Assert.AreEqual(carteRecupere, carte, "Utilisateurs pas identiques");
         }
 
         [TestMethod]
-        public void PostMarqueTest_Mok()
+        public void PostProduitTest_Mok()
         {
             // Arrange
-            var mockRepository = new Mock<IDataRepository<Marque>>();
-            var userController = new MarquesController(mockRepository.Object);
+            var mockRepository = new Mock<IDataRepository<Produit>>();
+            var userController = new ProduitsController(mockRepository.Object);
 
 
 
             // Arrange
-            Marque catre = new Marque
+            Produit catre = new Produit
             {
-                IdMarque = 1,
-                NomMarque = "SVG"
+                IdProduit = 1,
+                NomProduit = "SVG"
             };
             // Act
-            var actionResult = userController.PostMarque(catre).Result;
+            var actionResult = userController.PostProduit(catre).Result;
             // Assert
-            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Marque>), "Pas un ActionResult<Utilisateur>");
+            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Produit>), "Pas un ActionResult<Utilisateur>");
             Assert.IsInstanceOfType(actionResult.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
             var result = actionResult.Result as CreatedAtActionResult;
-            Assert.IsInstanceOfType(result.Value, typeof(Marque), "Pas un Utilisateur");
-            catre.IdMarque = ((Marque)result.Value).IdMarque;
-            Assert.AreEqual(catre, (Marque)result.Value, "Utilisateurs pas identiques");
+            Assert.IsInstanceOfType(result.Value, typeof(Produit), "Pas un Utilisateur");
+            catre.IdProduit = ((Produit)result.Value).IdProduit;
+            Assert.AreEqual(catre, (Produit)result.Value, "Utilisateurs pas identiques");
         }
 
         [TestMethod]
-        public void DeleteMarqueTest_AvecMoq()
+        public void DeleteProduitTest_AvecMoq()
         {
 
             // Arrange
-            Marque catre = new Marque
+            Produit catre = new Produit
             {
-                IdMarque = 200,
-                NomMarque = "SVG"
+                IdProduit = 200,
+                NomProduit = "SVG"
             };
-            var mockRepository = new Mock<IDataRepository<Marque>>();
+            var mockRepository = new Mock<IDataRepository<Produit>>();
             mockRepository.Setup(x => x.GetByIdAsync(2).Result).Returns(catre);
-            var userController = new MarquesController(mockRepository.Object);
+            var userController = new ProduitsController(mockRepository.Object);
             // Act
-            var actionResult = userController.DeleteMarque(2).Result;
+            var actionResult = userController.DeleteProduit(2).Result;
             // Assert
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
         }
     }
 }
-
-

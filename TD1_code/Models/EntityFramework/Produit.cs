@@ -10,7 +10,7 @@ namespace TD1_code.Models.EntityFramework
     {
         [Key]
         [Column("IdProduit")]
-        public int IdPorduit { get; set; }
+        public int IdProduit { get; set; }
 
         [Column("nomProduit")]
         public string NomProduit { get; set; }

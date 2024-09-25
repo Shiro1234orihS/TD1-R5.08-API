@@ -46,7 +46,7 @@ namespace TD1_code.Controllers
         // PUT: api/Utilisateurs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGammeMoto(int id, TypeProduit typeProduit)
+        public async Task<IActionResult> PutTypeProduit(int id, TypeProduit typeProduit)
         {
             if (id != typeProduit.IdTypeProduit)
             {
@@ -68,7 +68,7 @@ namespace TD1_code.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ActionName("PostTypeProduit")]
-        public async Task<ActionResult<TypeProduit>> PostGammeMoto(TypeProduit typeProduit)
+        public async Task<ActionResult<TypeProduit>> PostTypeProduit(TypeProduit typeProduit)
         {
             if (!ModelState.IsValid)
             {
@@ -81,7 +81,7 @@ namespace TD1_code.Controllers
         // DELETE: api/Utilisateurs/5
         [HttpDelete("{id}")]
         [ActionName("DeleteTypeProduit")]
-        public async Task<IActionResult> DeleteGammeMoto(int id)
+        public async Task<IActionResult> DeleteTypeProduit(int id)
         {
             var typeProduit = await _typeProduit.GetByIdAsync(id);
             if (typeProduit == null)

@@ -46,9 +46,9 @@ namespace TD1_code.Controllers
         // PUT: api/Utilisateurs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutGammeMoto(int id, Produit produit)
+        public async Task<IActionResult> PutProduit(int id, Produit produit)
         {
-            if (id != produit.IdPorduit)
+            if (id != produit.IdProduit)
             {
                 return BadRequest();
             }
@@ -68,20 +68,20 @@ namespace TD1_code.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ActionName("PostProduit")]
-        public async Task<ActionResult<Produit>> PostGammeMoto(Produit produit)
+        public async Task<ActionResult<Produit>> PostProduit(Produit produit)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
             await _produit.AddAsync(produit);
-            return CreatedAtAction("GetProduitById", new { id = produit.IdPorduit }, produit); // GetById : nom de l’action
+            return CreatedAtAction("GetProduitById", new { id = produit.IdProduit }, produit); // GetById : nom de l’action
         }
 
         // DELETE: api/Utilisateurs/5
         [HttpDelete("{id}")]
         [ActionName("DeleteProduit")]
-        public async Task<IActionResult> DeleteGammeMoto(int id)
+        public async Task<IActionResult> DeleteProduit(int id)
         {
             var produit = await _produit.GetByIdAsync(id);
             if (produit == null)

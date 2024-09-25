@@ -16,6 +16,6 @@ namespace TD1_code.Models.EntityFramework
         public string NomMarque {  get; set; }
 
         [InverseProperty(nameof(Produit.IdMarqueNavigation))]
-        public virtual ICollection<Produit> Produits { get; set; }
+        public virtual ICollection<Produit>? Produits { get; set; } = new List<Produit>();
     }
 }

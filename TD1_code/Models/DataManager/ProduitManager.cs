@@ -48,7 +48,7 @@ namespace TD1_code.Models.DataManager
         {
             dBContext.Entry(entityToUpdate).State = EntityState.Modified;
 
-            entityToUpdate.IdPorduit = entity.IdPorduit;
+            entityToUpdate.IdProduit = entity.IdProduit;
             entityToUpdate.NomProduit = entity.NomProduit;
             entityToUpdate.Description = entity.Description;
             entityToUpdate.NomPhoto = entity.NomPhoto;
