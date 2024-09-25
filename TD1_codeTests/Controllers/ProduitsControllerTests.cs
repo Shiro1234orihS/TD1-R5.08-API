@@ -34,160 +34,314 @@ namespace TD1_code.Controllers.Tests
             ProduitsController controller = new ProduitsController(dataRepository);
         }
 
-        #region ProduitsControllerTest
-        [TestMethod()]
-        public void ProduitsControllerTest()
+        #region Test unitaires
+
+        [TestMethod]
+        public void GetProduits_ReturnsRightItems()
         {
-            // Arrange : préparation des données attendues
-            var builder = new DbContextOptionsBuilder<DbContext>().UseNpgsql("Server = 51.83.36.122; port = 5432; Database = sa25; uid = sa25; password = 1G1Nxb; SearchPath = bmw");
-            context = new DBContexte(builder.Options);
-            dataRepository = new ProduitManager(context);
+            // Arrange
+            ProduitsController controller = new ProduitsController(dataRepository);
 
-            // Act : appel de la méthode à tester
-            var option = new ProduitsController(dataRepository);
+            // Act
+            var result = controller.Getproduits();
 
-            // Assert : vérification que les données obtenues correspondent aux données attendues : vérification que les données obtenues correspondent aux données attendues
-            Assert.IsNotNull(option, "L'instance de MaClasse ne devrait pas être null.");
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(ActionResult<IEnumerable<Produit>>), "Pas un ActionResult");
+            ActionResult<IEnumerable<Produit>> actionResult = result.Result as ActionResult<IEnumerable<Produit>>;
+            Assert.IsNotNull(actionResult, "ActionResult null");
+            Assert.IsNotNull(actionResult.Value, "Valeur nulle");
+            CollectionAssert.AreEqual(context.Produits.ToList(), (List<Produit>)actionResult.Value, "Pas les mêmes Produits");
         }
+
+        [TestMethod]
+        public void GetProduitById_ExistingIdPassed_ReturnsRightItem()
+        {
+            // Arrange
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            var result = controller.GetproduitById(1);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Produit>), "Pas un ActionResult");
+
+            var actionResult = result.Result as ActionResult<Produit>;
+
+            // Assert
+            Assert.IsNotNull(actionResult, "ActionResult null");
+            Assert.IsNotNull(actionResult.Value, "Valeur nulle");
+            Assert.IsInstanceOfType(actionResult.Value, typeof(Produit), "Pas un Produit");
+            Assert.AreEqual(context.Produits.Where(c => c.IdProduit == 1).FirstOrDefault(),
+                (Produit)actionResult.Value, "Produits pas identiques");
+        }
+
+        [TestMethod]
+        public void GetProduitById_UnknownIdPassed_ReturnsNotFoundResult()
+        {
+            // Arrange
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            var result = controller.GetproduitById(0);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Produit>), "Pas un ActionResult");
+            Assert.IsNull(result.Result.Value, "Produit pas null");
+        }
+
+        //[TestMethod]
+        //public void GetProduitByEmail_ExistingEmailPassed_ReturnsRightItem()
+        //{
+        //    // Arrange
+        //    ProduitsController controller = new ProduitsController(dataRepository);
+
+        //    // Act
+        //    var result = controller.Getb("gdominguez0@washingtonpost.com");
+
+        //    // Assert
+        //    Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Produit>), "Pas un ActionResult");
+
+        //    var actionResult = result.Result as ActionResult<Produit>;
+
+        //    // Assert
+        //    Assert.IsInstanceOfType(actionResult.Value, typeof(Produit), "Pas un Produit");
+        //    Assert.IsNotNull(actionResult.Value, "Valeur nulle");
+        //    Assert.AreEqual(context.Produits.Where(c => c.Mail.ToLower() == "gdominguez0@washingtonpost.com").FirstOrDefault(),
+        //        (Produit)actionResult.Value, "Produits pas identiques");
+        //}
+
+        //[TestMethod]
+        //public void GetProduitByEmail_UnknownEmailPassed_ReturnsNotFoundResult()
+        //{
+        //    // Arrange
+        //    ProduitsController controller = new ProduitsController(dataRepository);
+
+        //    // Act
+        //    var result = controller.GetProduitByEmail("123@free.fr");
+
+        //    // Assert
+        //    Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Produit>), "Pas un ActionResult");
+        //    Assert.IsNull(result.Result.Value, "Produit pas null");
+        //}
+
+        [TestMethod]
+        public void PostProduit_ModelValidated_CreationOK()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+            // Le mail doit être unique donc 2 possibilités :
+            // 1. on s'arrange pour que le mail soit unique en concaténant un random ou un timestamp
+            // 2. On supprime le Produit après l'avoir créé. Dans ce cas, nous avons besoin d'appeler la méthode DELETE du WS
+            Produit ProduitAtester = new Produit()
+            {
+                NomProduit = "SVG",
+            };
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            var result = controller.PostProduit(ProduitAtester).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre la création
+
+            // Assert
+            Produit? ProduitRecupere = context.Produits.Where(u => u.NomProduit.ToUpper() == ProduitAtester.NomProduit.ToUpper()).FirstOrDefault(); //On récupère l'Produit créé directement dans la BD grace à son mail unique
+            // On ne connait pas l'ID de l’Produit envoyé car numéro automatique.
+            // Du coup, on récupère l'ID de celui récupéré et on compare ensuite les 2 Produits
+            ProduitAtester.IdProduit = ProduitRecupere.IdProduit;
+            Assert.AreEqual(ProduitAtester, ProduitRecupere, "Produits pas identiques");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(System.AggregateException))]
+        public void PostCompte_MailMissing_CreationFailed()
+        {
+            // Arrange
+            Produit ProduitAtester = new Produit()
+            {
+                NomProduit = "SVG",
+            };
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            var result = controller.PostProduit(ProduitAtester).Result;
+        }
+
+        //IDEM POUR LES AUTRES CHAMPS NOT NULL (Pwd)
+
+        [TestMethod]
+        [ExpectedException(typeof(System.AggregateException))]
+        public void PostCompte_EmailNotUnique_CreationFailed()
+        {
+            // Arrange
+            Produit? Produit = context.Produits.Where(c => c.IdProduit == 1).FirstOrDefault();
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            // On ajoute un Produit existant
+            var result = controller.PostProduit(Produit).Result;
+        }
+
+
+
+
+        //IDEM POUR LES AUTRES CHAMPS NON CONFORMES AU MODELE
+
+
+        // IDEM POUR LE PUT.
+        [TestMethod]
+        public void PutProduit_ModelValidated_UpdateOK()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+            Produit Produit = new Produit
+            {
+                NomProduit = "SVG",
+            };
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            var result = controller.PutProduit(Produit.IdProduit, Produit).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre la création
+
+            // Assert
+            Produit? ProduitRecupere = context.Produits.Where(u => u.NomProduit.ToUpper() == Produit.NomProduit.ToUpper()).FirstOrDefault(); //On récupère l'Produit créé directement dans la BD grace à son mail unique
+            // On ne connait pas l'ID de l’Produit envoyé car numéro automatique.
+            // Du coup, on récupère l'ID de celui récupéré et on compare ensuite les 2 Produits
+            Assert.AreEqual(Produit, ProduitRecupere, "Produits pas identiques");
+        }
+
+        // Pareil pour les autres tests PUT
+
+
+        [TestMethod()]
+        public void DeleteProduitTest()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+            Produit ProduitASuppr = new Produit()
+            {
+                NomProduit = "SVG",
+            };
+            context.Produits.Add(ProduitASuppr);
+            context.SaveChanges();
+            ProduitASuppr.IdProduit = context.Produits.Where(c => c.NomProduit.ToLower() == ProduitASuppr.NomProduit.ToLower()).FirstOrDefault().IdProduit;
+            ProduitsController controller = new ProduitsController(dataRepository);
+
+            // Act
+            var result = controller.DeleteProduit(ProduitASuppr.IdProduit).Result;
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+            Assert.IsNull(context.Produits.Where(c => c.IdProduit == ProduitASuppr.IdProduit).FirstOrDefault());
+        }
+
         #endregion
 
 
+        #region Tests de substitution
+
         [TestMethod]
-        public void GetProduitByIdTest_AvecMoq()
+        public void GetProduitById_ExistingIdPassed_ReturnsRightItem_AvecMoq()
         {
             // Arrange
+            Produit Produit = new Produit
+            {
+                NomProduit = "SVG",
+            };
             var mockRepository = new Mock<IDataRepository<Produit>>();
+            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(Produit);
 
-            ICollection<Produit> AcquisC = new List<Produit>
-            {
-                new Produit { /* initialisez les propriétés de l'objet ici */ },
-                new Produit { /* un autre objet Acquerir */ }
-            };
+            var ProduitController = new ProduitsController(mockRepository.Object);
 
-
-            Produit catre = new Produit
-            {
-                IdProduit = 1,
-                NomProduit = "testMoq"
-            };
             // Act
-            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(catre);
-            var userController = new ProduitsController(mockRepository.Object);
+            var actionResult = ProduitController.GetproduitById(1).Result;
 
-            var actionResult = userController.GetproduitById(1).Result;
             // Assert
             Assert.IsNotNull(actionResult);
             Assert.IsNotNull(actionResult.Value);
-            Assert.AreEqual(catre, actionResult.Value as Produit);
+            Assert.AreEqual(Produit, actionResult.Value as Produit);
         }
 
-
-
-
         [TestMethod]
-        public void PutProduitTestAvecMoq()
+        public void GetProduitById_UnknownIdPassed_ReturnsNotFoundResult_AvecMoq()
         {
-
-            // Arrange
-            Produit ProduitToUpdate = new Produit
-            {
-                IdProduit = 200,
-                NomProduit = "SVG"
-
-            };
-            Produit updatedProduit = new Produit
-            {
-                IdProduit = 201,
-                NomProduit = "Svg"
-
-            };
             var mockRepository = new Mock<IDataRepository<Produit>>();
-            mockRepository.Setup(repo => repo.GetByIdAsync(200)).ReturnsAsync(ProduitToUpdate);
-            mockRepository.Setup(repo => repo.UpdateAsync(ProduitToUpdate, updatedProduit)).Returns(Task.CompletedTask);
-
-
-            var controller = new ProduitsController(mockRepository.Object);
+            var ProduitController = new ProduitsController(mockRepository.Object);
 
             // Act
-            var result = controller.PutProduit(200, updatedProduit).Result;
+            var actionResult = ProduitController.GetproduitById(0).Result;
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(NoContentResult), "La réponse n'est pas du type attendu NoContentResult");
-        }
-
-        /// <summary>
-        /// Test PostUtilisateur 
-        /// </summary>
-        /// 
-        [TestMethod()]
-        public void PostProduitTest()
-        {
-            //// Arrange
-
-            //Produit carte = new Produit
-            //{
-            //    IdProduit = 100,
-            //    NomCarte = "NUNES EMILIO Ricardo ",
-            //};
-
-            //// Act
-            //var result = controller.PostProduit(carte).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre l’ajout
-
-            //// Assert
-            //// On récupère l'utilisateur créé directement dans la BD grace à son mail unique
-            //Produit? carteRecupere = context.Produits
-            //    .Where(u => u.IdProduit == carte.IdProduit)
-            //    .FirstOrDefault();
-
-            //// On ne connait pas l'ID de l’utilisateur envoyé car numéro automatique.
-            //// Du coup, on récupère l'ID de celui récupéré et on compare ensuite les 2 users
-            //carte.IdProduit = carteRecupere.IdProduit;
-            //Assert.AreEqual(carteRecupere, carte, "Utilisateurs pas identiques");
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
         [TestMethod]
-        public void PostProduitTest_Mok()
+        public void PostProduit_ModelValidated_CreationOK_AvecMoq()
         {
             // Arrange
             var mockRepository = new Mock<IDataRepository<Produit>>();
             var userController = new ProduitsController(mockRepository.Object);
 
-
-
-            // Arrange
-            Produit catre = new Produit
+            Produit user = new Produit
             {
-                IdProduit = 1,
                 NomProduit = "SVG"
             };
+
             // Act
-            var actionResult = userController.PostProduit(catre).Result;
+            var actionResult = userController.PostProduit(user).Result;
+
             // Assert
-            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Produit>), "Pas un ActionResult<Utilisateur>");
+            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Produit>), "Pas un ActionResult<Produit>");
             Assert.IsInstanceOfType(actionResult.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
             var result = actionResult.Result as CreatedAtActionResult;
-            Assert.IsInstanceOfType(result.Value, typeof(Produit), "Pas un Utilisateur");
-            catre.IdProduit = ((Produit)result.Value).IdProduit;
-            Assert.AreEqual(catre, (Produit)result.Value, "Utilisateurs pas identiques");
+            Assert.IsInstanceOfType(result.Value, typeof(Produit), "Pas un Produit");
+            user.IdProduit = ((Produit)result.Value).IdProduit;
+            Assert.AreEqual(user, (Produit)result.Value, "Produits pas identiques");
         }
 
         [TestMethod]
         public void DeleteProduitTest_AvecMoq()
         {
-
             // Arrange
-            Produit catre = new Produit
+            Produit user = new Produit
             {
-                IdProduit = 200,
-                NomProduit = "SVG"
+                NomProduit = "SVG",
             };
+
             var mockRepository = new Mock<IDataRepository<Produit>>();
-            mockRepository.Setup(x => x.GetByIdAsync(2).Result).Returns(catre);
+            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(user);
             var userController = new ProduitsController(mockRepository.Object);
+
             // Act
-            var actionResult = userController.DeleteProduit(2).Result;
+            var actionResult = userController.DeleteProduit(1).Result;
+
             // Assert
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
         }
+
+        [TestMethod]
+        public void PutProduit_ModelValidated_UpdateOK_AvecMoq()
+        {
+            // Arrange
+            Produit userAMaJ = new Produit
+            {
+                NomProduit = "SVG",
+            };
+            Produit userUpdated = new Produit
+            {
+                NomProduit = "SVG",
+            };
+            var mockRepository = new Mock<IDataRepository<Produit>>();
+            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(userAMaJ);
+            var userController = new ProduitsController(mockRepository.Object);
+
+            // Act
+            var actionResult = userController.PutProduit(userUpdated.IdProduit, userUpdated).Result;
+
+            // Assert
+            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+        }
+
+        #endregion
     }
 }

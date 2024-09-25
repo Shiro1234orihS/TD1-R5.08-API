@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TD1_code.Models.DPO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 
@@ -36,8 +37,20 @@ namespace TD1_code.Models.DataManager
 
         public async Task<ActionResult<Produit>> GetByIdAsync(int id)
         {
-
             return await dBContext.Produits.FirstOrDefaultAsync(p => p.IdMarque == id);
+        }
+
+        public async Task<ActionResult<ProduitDto>> GetProduitDtoAsync(int id) 
+        {
+            Produit produitrecherche = await dBContext.Produits.FirstOrDefaultAsync(p => p.IdMarque == id);
+
+            ProduitDto DPOproduit = new ProduitDto
+            {
+                Id = produitrecherche.IdProduit,
+                Nom = produitrecherche.NomProduit
+            };
+
+            return DPOproduit;
         }
 
         public async Task<ActionResult<Produit>> GetByStringAsync(string str)
