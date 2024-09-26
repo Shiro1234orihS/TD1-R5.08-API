@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TD1_code", "TD1_code\TD1_co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TD1_codeTests", "TD1_codeTests\TD1_codeTests.csproj", "{D8D8FE47-3D66-4EB6-AE27-B1F4E6683054}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{D1474162-67FC-452F-BF1F-9BA54956A25F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{D1474162-67FC-452F-BF1F-9BA54956A25F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

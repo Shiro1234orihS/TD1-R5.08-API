@@ -9,8 +9,8 @@ namespace Client.Services
 {
     public interface IService
     {
-        public Task<List<Produit>> GetSeriesAsync(string nomControleur);
-        public Task<Produit> GetSerieAsync(string nomControleur, int serieId);
-        public Task<bool> PostSerieAsync(string nomControleur, Produit serie);
+        Task<List<Produit>> GetProduitsAsync(string nomControleur);
+        Task<Produit> GetProduitAsync(string nomControleur, int produitId);
+        Task<bool> PostProduitAsync(string nomControleur, Produit produit);
     }
 }

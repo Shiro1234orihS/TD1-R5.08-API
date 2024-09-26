@@ -1,68 +1,64 @@
-﻿using Client.Models;
+﻿using Client.Services;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-
-namespace Client.Services
+using Client.Models;
+public class WSProduit : IService
 {
-    public class WSProduit : IService
+    private static readonly HttpClient Client = new HttpClient { BaseAddress = new Uri("https://localhost:7132/api/Produits/") };
+
+    public WSProduit()
     {
-        private HttpClient client;
+        Client.DefaultRequestHeaders.Accept.Clear();
+        Client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+    }
 
-        public HttpClient Client
+    public async Task<Produit> GetProduitAsync(string nomControleur, int produitId)
+    {
+        try
         {
-            get { return client; }
-            set { client = value; }
+            return await Client.GetFromJsonAsync<Produit>(String.Concat(nomControleur, "/", produitId));
         }
-        public WSProduit(string uri)
+        catch (Exception ex)
         {
-            Client = new HttpClient();
-            Client.BaseAddress = new Uri(uri);
-            Client.DefaultRequestHeaders.Accept.Clear();
-            Client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
+            // Log the exception or throw
+            return null;
         }
-        public WSProduit() : this("http://localhost:5185/api/") { }
+    }
 
-        public async Task<Produit> GetproduitAsync(String nomControleur, Int32 produitId)
+    public async Task<List<Produit>> GetProduitsAsync(string nomControleur)
+    {
+        try
         {
-            try
-            {
-                return await Client.GetFromJsonAsync<Produit>(String.Concat(nomControleur, "/", produitId));
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            return await Client.GetFromJsonAsync<List<Produit>>(nomControleur);
         }
+        catch (Exception ex)
+        {
+            // Log the exception or throw
+            return null;
+        }
+    }
 
-        public async Task<List<Produit>> GetproduitsAsync(String nomControleur)
+    public async Task<bool> PostProduitAsync(string nomControleur, Produit produit)
+    {
+        var response = await Client.PostAsJsonAsync(nomControleur, produit);
+        if (!response.IsSuccessStatusCode)
         {
-            try
-            {
-                return await Client.GetFromJsonAsync<List<Produit>>(nomControleur);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
+            // Optionally handle error
+            var error = await response.Content.ReadAsStringAsync();
+            return false;
         }
+        return true;
+    }
 
-        public async Task<Boolean> PostproduitAsync(String nomControleur, Produit produit)
-        {
-            var response = await Client.PostAsJsonAsync(nomControleur, produit);
-            return response.IsSuccessStatusCode;
-        }
+    public async Task<bool> DeleteProduitAsync(string nomControler, int produitId)
+    {
+        var response = await Client.DeleteAsync(String.Concat(nomControler, "/", produitId));
+        return response.IsSuccessStatusCode;
+    }
 
-        public async Task<bool> DeleteproduitAsync(string nomControler, Produit produit)
-        {
-            var response = await Client.DeleteAsync(String.Concat(nomControler, "/", produit.IdProduit));
-            return response.IsSuccessStatusCode;
-        }
-
-        public async Task<bool> EditproduitAsync(string nomControler, int idToEdit, Produit produit)
-        {
-            var response = await Client.PutAsJsonAsync(String.Concat(nomControler, "/", idToEdit), produit);
-            return response.IsSuccessStatusCode;
-        }
+    public async Task<bool> EditProduitAsync(string nomControler, int idToEdit, Produit produit)
+    {
+        var response = await Client.PutAsJsonAsync(String.Concat(nomControler, "/", idToEdit), produit);
+        return response.IsSuccessStatusCode;
     }
 }

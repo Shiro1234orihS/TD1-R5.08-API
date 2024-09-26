@@ -1,0 +1,65 @@
+﻿@page "/produit"
+@using Models
+ 
+
+<h3>Visualisation des produits</h3>
+
+<p>Ce composant démontre comment récupérer des données depuis un serveur</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Description</th>
+            <th>Marque</th>
+            <th>Type de Produit</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (produits == null)
+        {
+            <tr>
+                <td colspan="4">Chargement en cours...</td>
+            </tr>
+        }
+        else if (produits.Count == 0)
+        {
+            <tr>
+                <td colspan="4">Aucun produit trouvé</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var produit in produits)
+            {
+                <tr>
+                    <td>@produit.NomProduit</td>
+                    <td>@produit.Description</td>
+                    <td>@produit.IdMarque</td>
+                    <td>@produit.IdTypeProduit</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@code {
+    private WSProduit ProduitService = new WSProduit();
+    private List<Client.Models.Produit> produits;
+
+    // Méthode appelée à l'initialisation du composant pour récupérer les produits
+    protected override async Task OnInitializedAsync()
+    {
+        // Appel au service pour récupérer les produits via l'API
+        produits = await ProduitService.GetProduitsAsync("GetProduits");
+
+        // Si tu as besoin d'afficher un message d'erreur en cas d'échec de l'appel
+        if (produits == null)
+        {
+            produits = new List<Client.Models.Produit>(); // On initialise la liste vide pour éviter des erreurs dans la vue
+        }
+        Console.WriteLine("Message de débogage dans Blazor Server");
+
+    }
+}
+
