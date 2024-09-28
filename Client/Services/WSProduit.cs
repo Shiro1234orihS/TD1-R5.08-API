@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 using Client.Models;
 public class WSProduit : IService
 {
-    private static readonly HttpClient Client = new HttpClient { BaseAddress = new Uri("https://localhost:7132/api/Produits/") };
+    private static readonly HttpClient Client = new HttpClient { BaseAddress = new Uri("https://localhost:7132/api/") };
 
     public WSProduit()
     {
