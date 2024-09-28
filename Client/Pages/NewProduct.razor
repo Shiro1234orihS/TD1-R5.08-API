@@ -1,54 +1,79 @@
 ﻿@page "/NewProduct"
+@using Client.Services
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
 <h3 class="mb-4">Ajouter un nouveau produit</h3>
 
 <div class="container">
-    <form>
+    <form @onsubmit="OnSubmitProduct">
         <div class="mb-3">
             <label for="nomProduit" class="form-label">Nom du produit</label>
-            <input id="nomProduit" type="text" class="form-control" placeholder="Entrez le nom du produit" />
+            <input id="nomProduit" type="text" class="form-control" placeholder="Entrez le nom du produit" @bind="newProduct.NomProduit" />
         </div>
 
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <input id="description" type="text" class="form-control" placeholder="Entrez la description du produit" />
+            <input id="description" type="text" class="form-control" placeholder="Entrez la description du produit" @bind="newProduct.Description" />
         </div>
 
         <div class="mb-3">
             <label for="nomPhoto" class="form-label">Nom de la photo</label>
-            <input id="nomPhoto" type="text" class="form-control" placeholder="Entrez le nom de la photo" />
+            <input id="nomPhoto" type="text" class="form-control" placeholder="Entrez le nom de la photo" @bind="newProduct.NomPhoto" />
         </div>
 
         <div class="mb-3">
             <label for="uriPhoto" class="form-label">URI de la photo</label>
-            <input id="uriPhoto" type="text" class="form-control" placeholder="Entrez l'URI de la photo" />
+            <input id="uriPhoto" type="text" class="form-control" placeholder="Entrez l'URI de la photo" @bind="newProduct.UriPhoto" />
         </div>
 
         <div class="mb-3">
-            <label for="idTypeProduit" class="form-label">Type de produit</label>
-            <input id="idTypeProduit" type="text" class="form-control" placeholder="Entrez l'ID du type de produit" />
+            <label for="idTypeProduit" class="form-label">Choisissez un type de produit</label>
+            <select id="idTypeProduit" class="form-select" @bind="newProduct.IdTypeProduit">
+                @if (typeProduits == null)
+                {
+                    <option>Chargement des types de produit...</option>
+                }
+                else
+                {
+                    @foreach (var typeProduit in typeProduits)
+                    {
+                        <option value="@typeProduit.IdTypeProduit">@typeProduit.NomTypeProduit</option>
+                    }
+                }
+            </select>
         </div>
 
         <div class="mb-3">
-            <label for="idMarque" class="form-label">Marque</label>
-            <input id="idMarque" type="text" class="form-control" placeholder="Entrez l'ID de la marque" />
+            <label for="idMarque" class="form-label">Choisissez une marque</label>
+            <select id="idMarque" class="form-select" @bind="newProduct.IdMarque">
+                @if (marques == null)
+                {
+                    <option>Chargement des marques...</option>
+                }
+                else
+                {
+                    @foreach (var marque in marques)
+                    {
+                        <option value="@marque.IdMarque">@marque.NomMarque</option>
+                    }
+                }
+            </select>
         </div>
 
         <div class="mb-3">
             <label for="stockReel" class="form-label">Stock réel</label>
-            <input id="stockReel" type="text" class="form-control" placeholder="Entrez le stock réel" />
+            <input id="stockReel" type="number" class="form-control" placeholder="Entrez le stock réel" @bind="newProduct.StockReel" />
         </div>
 
         <div class="mb-3">
             <label for="stockMin" class="form-label">Stock minimum</label>
-            <input id="stockMin" type="text" class="form-control" placeholder="Entrez le stock minimum" />
+            <input id="stockMin" type="number" class="form-control" placeholder="Entrez le stock minimum" @bind="newProduct.StockMin" />
         </div>
 
         <div class="mb-3">
             <label for="stockMax" class="form-label">Stock maximum</label>
-            <input id="stockMax" type="text" class="form-control" placeholder="Entrez le stock maximum" />
+            <input id="stockMax" type="number" class="form-control" placeholder="Entrez le stock maximum" @bind="newProduct.StockMax" />
         </div>
 
         <button type="submit" class="btn btn-primary">Créer un produit</button>
@@ -56,5 +81,44 @@
 </div>
 
 @code {
-    // Ton code C# ici
+    private WSMarque marqueService = new WSMarque();
+    private WSTypeProduit typeProduitService = new WSTypeProduit();
+    private List<Client.Models.Marque> marques;
+    private List<Client.Models.TypeProduit> typeProduits;
+    private WSProduit ProduitService = new WSProduit();
+
+    private Client.Models.Produit newProduct = new Client.Models.Produit();  // Propriété pour le nouveau produit
+
+    // Méthode appelée à l'initialisation du composant pour récupérer les données
+    protected override async Task OnInitializedAsync()
+    {
+        marques = await marqueService.GetMarqueAsync("Marques/GetMarques");
+        typeProduits = await typeProduitService.GetMarqueAsync("TypeProduits/GettypeProduits");
+
+        if (marques == null)
+        {
+            marques = new List<Client.Models.Marque>();
+        }
+        if (typeProduits == null)
+        {
+            typeProduits = new List<Client.Models.TypeProduit>();
+        }
+    }
+
+    // Méthode pour envoyer le produit à l'API lors de la soumission du formulaire
+    private async Task OnSubmitProduct()
+    {
+        // Appel à ton service pour envoyer les données
+        var result = await ProduitService.PostProduitAsync("Produits/PostProduit", newProduct);
+        if (result)
+        {
+            // Optionnel : tu peux rediriger vers une autre page ou afficher un message de succès
+            Console.WriteLine("Produit créé avec succès !");
+        }
+        else
+        {
+            // Gérer les erreurs de création
+            Console.WriteLine("Erreur lors de la création du produit.");
+        }
+    }
 }
