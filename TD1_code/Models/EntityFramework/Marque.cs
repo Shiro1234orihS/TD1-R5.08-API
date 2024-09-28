@@ -10,6 +10,7 @@ namespace TD1_code.Models.EntityFramework
     {
         [Key]
         [Column("idMarque")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  // Ajout de cette ligne pour l'auto-incrémentation
         public int IdMarque { get; set; }
 
         [Column("nomMarque")]

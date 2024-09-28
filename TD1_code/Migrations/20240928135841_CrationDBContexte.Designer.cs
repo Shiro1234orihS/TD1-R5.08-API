@@ -11,7 +11,7 @@ using TD1_code.Models.EntityFramework;
 namespace TD1_code.Migrations
 {
     [DbContext(typeof(DBContexte))]
-    [Migration("20240918071111_CrationDBContexte")]
+    [Migration("20240928135841_CrationDBContexte")]
     partial class CrationDBContexte
     {
         /// <inheritdoc />
@@ -59,9 +59,12 @@ namespace TD1_code.Migrations
                         .HasColumnType("text")
                         .HasColumnName("description");
 
-                    b.Property<int>("IdPorduit")
+                    b.Property<int>("IdProduit")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("IdProduit");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdProduit"));
 
                     b.Property<string>("NomPhoto")
                         .IsRequired()

@@ -43,7 +43,8 @@ namespace TD1_code.Migrations
                 {
                     idTypeProduit = table.Column<int>(type: "integer", nullable: false),
                     idMarque = table.Column<int>(type: "integer", nullable: false),
-                    IdProduit = table.Column<int>(type: "integer", nullable: false),
+                    IdProduit = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     nomProduit = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     nomPhoto = table.Column<string>(type: "text", nullable: false),

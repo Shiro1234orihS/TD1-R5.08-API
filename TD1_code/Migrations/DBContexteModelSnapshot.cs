@@ -57,8 +57,11 @@ namespace TD1_code.Migrations
                         .HasColumnName("description");
 
                     b.Property<int>("IdProduit")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasColumnName("IdProduit");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdProduit"));
 
                     b.Property<string>("NomPhoto")
                         .IsRequired()

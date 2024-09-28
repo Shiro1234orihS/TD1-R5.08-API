@@ -10,6 +10,7 @@ namespace TD1_code.Models.EntityFramework
     {
         [Key]
         [Column("IdProduit")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]  
         public int IdProduit { get; set; }
 
         [Column("nomProduit")]
@@ -42,10 +43,10 @@ namespace TD1_code.Models.EntityFramework
 
         [ForeignKey("IdMarque")]
         [InverseProperty(nameof(Marque.Produits))]
-        public virtual Marque IdMarqueNavigation { get; set; }
+        public virtual Marque? IdMarqueNavigation { get; set; } 
 
         [ForeignKey("IdTypeProduit")]
         [InverseProperty(nameof(TypeProduit.Produits))]
-        public virtual TypeProduit IdTypeProduitNavigation { get; set; }
+        public virtual TypeProduit? IdTypeProduitNavigation { get; set; } 
     }
 }
