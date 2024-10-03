@@ -89,5 +89,59 @@
 </div>
 
 @code {
-    // Ton code C# ici
+    // Services injectés
+    private WSMarque marqueService = new WSMarque();
+    private WSTypeProduit typeProduitService = new WSTypeProduit();
+    private WSProduit produitService = new WSProduit();
+
+    // Propriétés pour le formulaire
+    private List<Client.Models.Marque> marques = new List<Client.Models.Marque>();
+    private List<Client.Models.TypeProduit> typeProduits = new List<Client.Models.TypeProduit>();
+    private Client.Models.Produit newProduct = new Client.Models.Produit();
+    private string message = null;
+
+    // Initialisation des données
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    // Charger les marques et les types de produits
+    private async Task LoadDataAsync()
+    {
+        marques = await marqueService.GetMarqueAsync("Marques/GetMarques");
+        typeProduits = await typeProduitService.GetMarqueAsync("TypeProduits/GettypeProduits");
+
+        if (marques == null || marques.Count == 0)
+        {
+            marques = new List<Client.Models.Marque>();
+        }
+        if (typeProduits == null || typeProduits.Count == 0)
+        {
+            typeProduits = new List<Client.Models.TypeProduit>();
+        }
+    }
+
+    // Méthode de soumission du formulaire
+    private async Task OnSubmitProductAsync()
+    {
+        message = null;  // Reset du message
+
+
+        // Envoyer le produit à l'API via le service WSProduit
+        var result = await produitService.PostProduitAsync("Produits/PostProduit", newProduct);
+        Console.WriteLine(newProduct.ToString());
+
+        if (result)
+        {
+            message = "Produit créé avec succès !";
+            newProduct = new Client.Models.Produit();  // Réinitialisation du formulaire
+            Navigation.NavigateTo("/produit");  // Redirection vers la liste des produits
+
+        }
+        else
+        {
+            message = "Erreur lors de la création du produit. Veuillez réessayer.";
+        }
+    }
 }

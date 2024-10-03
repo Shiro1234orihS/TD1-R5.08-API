@@ -37,7 +37,7 @@ namespace TD1_code.Models.DataManager
 
         public async Task<ActionResult<Produit>> GetByIdAsync(int id)
         {
-            return await dBContext.Produits.FirstOrDefaultAsync(p => p.IdMarque == id);
+            return await dBContext.Produits.FirstOrDefaultAsync(p => p.IdProduit == id);
         }
 
         public async Task<ActionResult<ProduitDto>> GetProduitDtoAsync(int id) 

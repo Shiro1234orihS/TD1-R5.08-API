@@ -28,7 +28,7 @@ namespace TD1_code.Controllers.Tests
         [TestInitialize]
         public void Init()
         {
-            var builder = new DbContextOptionsBuilder<DBContexte>().UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
+            var builder = new DbContextOptionsBuilder<DBContexte>().UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
             DBContexte dbContext = new DBContexte(builder.Options);
             dataRepository = new MarqueManager(context);
             // Création du gestionnaire de données et du contrôleur à tester
@@ -89,41 +89,6 @@ namespace TD1_code.Controllers.Tests
             Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Marque>), "Pas un ActionResult");
             Assert.IsNull(result.Result.Value, "Marque pas null");
         }
-
-        //[TestMethod]
-        //public void GetMarqueByEmail_ExistingEmailPassed_ReturnsRightItem()
-        //{
-        //    // Arrange
-        //    MarquesController controller = new MarquesController(dataRepository);
-
-        //    // Act
-        //    var result = controller.Getb("gdominguez0@washingtonpost.com");
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Marque>), "Pas un ActionResult");
-
-        //    var actionResult = result.Result as ActionResult<Marque>;
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(actionResult.Value, typeof(Marque), "Pas un Marque");
-        //    Assert.IsNotNull(actionResult.Value, "Valeur nulle");
-        //    Assert.AreEqual(context.Marques.Where(c => c.Mail.ToLower() == "gdominguez0@washingtonpost.com").FirstOrDefault(),
-        //        (Marque)actionResult.Value, "Marques pas identiques");
-        //}
-
-        //[TestMethod]
-        //public void GetMarqueByEmail_UnknownEmailPassed_ReturnsNotFoundResult()
-        //{
-        //    // Arrange
-        //    MarquesController controller = new MarquesController(dataRepository);
-
-        //    // Act
-        //    var result = controller.GetMarqueByEmail("123@free.fr");
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(result.Result, typeof(ActionResult<Marque>), "Pas un ActionResult");
-        //    Assert.IsNull(result.Result.Value, "Marque pas null");
-        //}
 
         [TestMethod]
         public void PostMarque_ModelValidated_CreationOK()
@@ -218,23 +183,38 @@ namespace TD1_code.Controllers.Tests
         {
             // Arrange
             Random rnd = new Random();
-            int chiffre = rnd.Next(1, 1000000000);
-            Marque MarqueASuppr = new Marque()
+            int chiffre = rnd.Next(100, 10000);
+            Marque MarqueASuppr = new Marque
             {
-                NomMarque = "SVG",
+                
+                NomMarque = "SVG"
             };
             context.Marques.Add(MarqueASuppr);
             context.SaveChanges();
-            MarqueASuppr.IdMarque = context.Marques.Where(c => c.NomMarque.ToLower() == MarqueASuppr.NomMarque.ToLower()).FirstOrDefault().IdMarque;
+
+            var marque = context.Marques
+                .Where(c => c.NomMarque.ToLower() == MarqueASuppr.NomMarque.ToLower())
+                .FirstOrDefault();
+
+            if (marque == null)
+            {
+                Assert.Fail("La marque n'a pas été trouvée dans la base de données.");
+            }
+            else
+            {
+                MarqueASuppr.IdMarque = marque.IdMarque;
+            }
+
             MarquesController controller = new MarquesController(dataRepository);
 
             // Act
             var result = controller.DeleteMarque(MarqueASuppr.IdMarque).Result;
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult");
             Assert.IsNull(context.Marques.Where(c => c.IdMarque == MarqueASuppr.IdMarque).FirstOrDefault());
         }
+
 
         #endregion
 

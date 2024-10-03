@@ -40,6 +40,7 @@ public class WSProduit : IService
 
     public async Task<bool> PostProduitAsync(string nomControleur, Produit produit)
     {
+        
         var response = await Client.PostAsJsonAsync(nomControleur, produit);
         if (!response.IsSuccessStatusCode)
         {

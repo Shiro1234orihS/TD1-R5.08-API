@@ -21,7 +21,7 @@ namespace TD1_code.Models.EntityFramework
         {
             modelBuilder.Entity<Produit>(entity =>
             {
-                entity.HasKey(e => new { e.IdMarque, e.IdTypeProduit }).HasName("pk_produit");
+                entity.HasKey(e => new { e.IdProduit }).HasName("pk_produit");
 
                 
 

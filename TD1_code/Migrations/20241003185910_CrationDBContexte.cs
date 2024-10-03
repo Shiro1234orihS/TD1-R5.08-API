@@ -41,21 +41,21 @@ namespace TD1_code.Migrations
                 name: "Produit",
                 columns: table => new
                 {
-                    idTypeProduit = table.Column<int>(type: "integer", nullable: false),
-                    idMarque = table.Column<int>(type: "integer", nullable: false),
                     IdProduit = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     nomProduit = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     nomPhoto = table.Column<string>(type: "text", nullable: false),
                     uriPhoto = table.Column<string>(type: "text", nullable: false),
+                    idTypeProduit = table.Column<int>(type: "integer", nullable: false),
+                    idMarque = table.Column<int>(type: "integer", nullable: false),
                     stockReel = table.Column<int>(type: "integer", nullable: false),
                     stockMin = table.Column<int>(type: "integer", nullable: false),
                     stockMax = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_produit", x => new { x.idMarque, x.idTypeProduit });
+                    table.PrimaryKey("pk_produit", x => x.IdProduit);
                     table.ForeignKey(
                         name: "fk_produit_marque",
                         column: x => x.idMarque,
@@ -67,6 +67,11 @@ namespace TD1_code.Migrations
                         principalTable: "TypeProduit",
                         principalColumn: "idTypeProduit");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Produit_idMarque",
+                table: "Produit",
+                column: "idMarque");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Produit_idTypeProduit",

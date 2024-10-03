@@ -43,6 +43,18 @@ namespace TD1_code.Migrations
 
             modelBuilder.Entity("TD1_code.Models.EntityFramework.Produit", b =>
                 {
+                    b.Property<int>("IdProduit")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("IdProduit");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdProduit"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
                     b.Property<int>("IdMarque")
                         .HasColumnType("integer")
                         .HasColumnName("idMarque");
@@ -50,18 +62,6 @@ namespace TD1_code.Migrations
                     b.Property<int>("IdTypeProduit")
                         .HasColumnType("integer")
                         .HasColumnName("idTypeProduit");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<int>("IdProduit")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("IdProduit");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("IdProduit"));
 
                     b.Property<string>("NomPhoto")
                         .IsRequired()
@@ -90,8 +90,10 @@ namespace TD1_code.Migrations
                         .HasColumnType("text")
                         .HasColumnName("uriPhoto");
 
-                    b.HasKey("IdMarque", "IdTypeProduit")
+                    b.HasKey("IdProduit")
                         .HasName("pk_produit");
+
+                    b.HasIndex("IdMarque");
 
                     b.HasIndex("IdTypeProduit");
 

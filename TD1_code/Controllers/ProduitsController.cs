@@ -43,7 +43,7 @@ namespace TD1_code.Controllers
             return produit;
         }
 
-        // PUT: api/Utilisateurs/5
+        // PUT: api/PutProduit/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduit(int id, Produit produit)
@@ -64,7 +64,7 @@ namespace TD1_code.Controllers
             }
         }
 
-        // POST: api/Utilisateurs
+        // POST: api/PostProduit
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ActionName("PostProduit")]
@@ -78,7 +78,7 @@ namespace TD1_code.Controllers
             return CreatedAtAction("GetProduitById", new { id = produit.IdProduit }, produit); // GetById : nom de l’action
         }
 
-        // DELETE: api/Utilisateurs/5
+        // DELETE: api/DeleteProduit/5
         [HttpDelete("{id}")]
         [ActionName("DeleteProduit")]
         public async Task<IActionResult> DeleteProduit(int id)

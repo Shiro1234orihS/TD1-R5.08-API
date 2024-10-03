@@ -27,7 +27,7 @@ namespace TD1_code.Controllers.Tests
         [TestInitialize]
         public void Init()
         {
-            var builder = new DbContextOptionsBuilder<DBContexte>().UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
+            var builder = new DbContextOptionsBuilder<DBContexte>().UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
             DBContexte dbContext = new DBContexte(builder.Options);
             dataRepository = new ProduitManager(context);
             // Création du gestionnaire de données et du contrôleur à tester

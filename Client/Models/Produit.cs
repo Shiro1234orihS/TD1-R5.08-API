@@ -31,6 +31,20 @@
             return HashCode.Combine(IdProduit, NomProduit, Description, NomPhoto, UriPhoto, StockReel, StockMin , StockMax);
         }
 
+        public override String? ToString()
+        {
+            return "IdProduit :" + IdProduit +"\n"
+                    + "NomProduit :" + NomProduit + "\n"
+                     + "Description :" + Description + "\n"
+                      + "NomPhoto :" + NomPhoto + "\n"
+                       + "UriPhoto :" + UriPhoto + "\n"
+                        + "IdTypeProduit :" + IdTypeProduit + "\n"
+                         + "IdMarque :" + IdMarque + "\n"
+                          + "StockReel :" + StockReel + "\n"
+                           + "StockMin :" + StockMin + "\n"
+                            + "StockMax :" + StockMax + "\n";
+        }
+
         public Produit(Int32 idProduit, String nomProduit, String description, String nomPhoto, String uriPhoto, Int32 idTypeProduit, Int32 idMarque, Int32 stockReel, Int32 stockMin, Int32 stockMax)
         {
             this.IdProduit = idProduit;
