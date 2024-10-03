@@ -74,6 +74,10 @@ namespace TD1_code.Controllers
             {
                 return BadRequest(ModelState);
             }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _produit.AddAsync(produit);
             return CreatedAtAction("GetProduitById", new { id = produit.IdProduit }, produit); // GetById : nom de l’action
         }
