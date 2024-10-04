@@ -11,7 +11,7 @@ using TD1_code.Models.EntityFramework;
 namespace TD1_code.Migrations
 {
     [DbContext(typeof(DBContexte))]
-    [Migration("20241003185910_CrationDBContexte")]
+    [Migration("20241004062500_CrationDBContexte")]
     partial class CrationDBContexte
     {
         /// <inheritdoc />

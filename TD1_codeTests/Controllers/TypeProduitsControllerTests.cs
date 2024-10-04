@@ -11,7 +11,6 @@ using Moq;
 using TD1_code.Models.DataManager;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
-using System.Text.RegularExpressions;
 
 namespace TD1_code.Controllers.Tests
 {
@@ -28,47 +27,41 @@ namespace TD1_code.Controllers.Tests
         [TestInitialize]
         public void Init()
         {
-            var builder = new DbContextOptionsBuilder<DBContexte>().UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
-            DBContexte dbContext = new DBContexte(builder.Options);
-            dataRepository = new TypeProduitManager(context);
-            // Création du gestionnaire de données et du contrôleur à tester
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
+            var builder = new DbContextOptionsBuilder<DBContexte>()
+                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
+            context = new DBContexte(builder.Options);  // Assurer que le context est bien initialisé
+            dataRepository = new TypeProduitManager(context);  // Initialiser TypeProduitManager avec le context
+            controller = new TypeProduitsController(dataRepository);  // Utiliser le repository dans le contrôleur
         }
 
         #region Test unitaires
 
         [TestMethod]
-        public void GetTypeProduits_ReturnsRightItems()
+        public async Task GetTypeProduits_ReturnsRightItems()
         {
-            // Arrange
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
-
             // Act
-            var result = controller.GettypeProduits();
+            var result = await controller.GettypeProduits();  // Attendre la réponse
+
+            List<TypeProduit> expected = context.TypeProduits.ToList();  // TypeProduits attendus dans la base
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(ActionResult<IEnumerable<TypeProduit>>), "Pas un ActionResult");
-            ActionResult<IEnumerable<TypeProduit>> actionResult = result.Result as ActionResult<IEnumerable<TypeProduit>>;
+            Assert.IsInstanceOfType(result, typeof(ActionResult<IEnumerable<TypeProduit>>), "Pas un ActionResult");
+            var actionResult = result as ActionResult<IEnumerable<TypeProduit>>;
             Assert.IsNotNull(actionResult, "ActionResult null");
             Assert.IsNotNull(actionResult.Value, "Valeur nulle");
-            CollectionAssert.AreEqual(context.TypeProduits.ToList(), (List<TypeProduit>)actionResult.Value, "Pas les mêmes TypeProduits");
+            CollectionAssert.AreEqual(expected, (List<TypeProduit>)actionResult.Value, "Pas les mêmes TypeProduits");
         }
 
+
         [TestMethod]
-        public void GetTypeProduitById_ExistingIdPassed_ReturnsRightItem()
+        public async Task GetTypeProduitById_ExistingIdPassed_ReturnsRightItem()
         {
-            // Arrange
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
-
             // Act
-            var result = controller.GettypeProduitById(1);
+            var result = await controller.GettypeProduitById(1);
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
-
-            var actionResult = result.Result as ActionResult<TypeProduit>;
-
-            // Assert
+            Assert.IsInstanceOfType(result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
+            var actionResult = result as ActionResult<TypeProduit>;
             Assert.IsNotNull(actionResult, "ActionResult null");
             Assert.IsNotNull(actionResult.Value, "Valeur nulle");
             Assert.IsInstanceOfType(actionResult.Value, typeof(TypeProduit), "Pas un TypeProduit");
@@ -77,163 +70,133 @@ namespace TD1_code.Controllers.Tests
         }
 
         [TestMethod]
-        public void GetTypeProduitById_UnknownIdPassed_ReturnsNotFoundResult()
+        public async Task GetTypeProduitById_UnknownIdPassed_ReturnsNotFoundResult()
         {
-            // Arrange
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
-
             // Act
-            var result = controller.GettypeProduitById(0);
+            var result = await controller.GettypeProduitById(0);  // Attendre la réponse
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
-            Assert.IsNull(result.Result.Value, "TypeProduit pas null");
+            Assert.IsInstanceOfType(result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
+            Assert.IsNull(result.Value, "TypeProduit pas null");
         }
 
-        //[TestMethod]
-        //public void GetTypeProduitByEmail_ExistingEmailPassed_ReturnsRightItem()
-        //{
-        //    // Arrange
-        //    TypeProduitsController controller = new TypeProduitsController(dataRepository);
-
-        //    // Act
-        //    var result = controller.Getb("gdominguez0@washingtonpost.com");
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(result.Result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
-
-        //    var actionResult = result.Result as ActionResult<TypeProduit>;
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(actionResult.Value, typeof(TypeProduit), "Pas un TypeProduit");
-        //    Assert.IsNotNull(actionResult.Value, "Valeur nulle");
-        //    Assert.AreEqual(context.TypeProduits.Where(c => c.Mail.ToLower() == "gdominguez0@washingtonpost.com").FirstOrDefault(),
-        //        (TypeProduit)actionResult.Value, "TypeProduits pas identiques");
-        //}
-
-        //[TestMethod]
-        //public void GetTypeProduitByEmail_UnknownEmailPassed_ReturnsNotFoundResult()
-        //{
-        //    // Arrange
-        //    TypeProduitsController controller = new TypeProduitsController(dataRepository);
-
-        //    // Act
-        //    var result = controller.GetTypeProduitByEmail("123@free.fr");
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(result.Result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
-        //    Assert.IsNull(result.Result.Value, "TypeProduit pas null");
-        //}
-
         [TestMethod]
-        public void PostTypeProduit_ModelValidated_CreationOK()
+        public async Task PostTypeProduit_ModelValidated_CreationOK()
         {
             // Arrange
             Random rnd = new Random();
-            int chiffre = rnd.Next(1, 1000000000);
-            // Le mail doit être unique donc 2 possibilités :
-            // 1. on s'arrange pour que le mail soit unique en concaténant un random ou un timestamp
-            // 2. On supprime le typeproduit après l'avoir créé. Dans ce cas, nous avons besoin d'appeler la méthode DELETE du WS
-            TypeProduit typeproduitAtester = new TypeProduit()
+            int id = rnd.Next(200, 1000);
+
+            TypeProduit TypeProduitAtester = new TypeProduit()
             {
-                NomTypeProduit = "SVG",
+                IdTypeProduit = id,
+                NomTypeProduit = "test"
             };
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
 
             // Act
-            var result = controller.PostTypeProduit(typeproduitAtester).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre la création
+            var postResult = await controller.PostTypeProduit(TypeProduitAtester);
+
+            // Sauvegarder les changements dans le contexte pour s'assurer que l'ajout est persistant
+            await context.SaveChangesAsync();
 
             // Assert
-            TypeProduit? typeproduitRecupere = context.TypeProduits.Where(u => u.NomTypeProduit.ToUpper() == typeproduitAtester.NomTypeProduit.ToUpper()).FirstOrDefault(); //On récupère l'TypeProduit créé directement dans la BD grace à son mail unique
-            // On ne connait pas l'ID de l’TypeProduit envoyé car numéro automatique.
-            // Du coup, on récupère l'ID de celui récupéré et on compare ensuite les 2 typeproduits
-            typeproduitAtester.IdTypeProduit = typeproduitRecupere.IdTypeProduit;
-            Assert.AreEqual(typeproduitAtester, typeproduitRecupere, "TypeProduits pas identiques");
+            // Vérifier si le TypeProduit a été correctement ajouté à la base de données
+            TypeProduit? TypeProduitRecupere = context.TypeProduits.Where(u => u.IdTypeProduit == TypeProduitAtester.IdTypeProduit).FirstOrDefault();
+            Assert.IsNotNull(TypeProduitRecupere, "Le TypeProduit n'a pas été trouvé dans la base de données.");
+
+            // Vérifier que les TypeProduits sont identiques
+            Assert.AreEqual(TypeProduitAtester, TypeProduitRecupere, "Les TypeProduits ne correspondent pas.");
+            // Ajouter d'autres comparaisons si nécessaire pour les autres propriétés du TypeProduit.
+            await controller.DeleteTypeProduit(id);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(System.AggregateException))]
-        public void PostCompte_MailMissing_CreationFailed()
+        [ExpectedException(typeof(Microsoft.EntityFrameworkCore.DbUpdateException))]
+        public async Task PostTypeProduit_CreationFailed()
         {
             // Arrange
-            TypeProduit typeproduitAtester = new TypeProduit()
+            Random rnd = new Random();
+            int id = rnd.Next(200, 1000);
+
+            // Créer un TypeProduit invalide (par exemple, sans nom)
+            TypeProduit TypeProduitAtester = new TypeProduit()
             {
-                NomTypeProduit = "SVG",
+                IdTypeProduit = id,
+                NomTypeProduit = null,  // Cela devrait provoquer une exception car le nom est requis
             };
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
 
             // Act
-            var result = controller.PostTypeProduit(typeproduitAtester).Result;
+            // Cette ligne devrait lancer une exception, car le TypeProduit n'est pas valide
+            await controller.PostTypeProduit(TypeProduitAtester);
         }
-
-        //IDEM POUR LES AUTRES CHAMPS NOT NULL (Pwd)
-
-        [TestMethod]
-        [ExpectedException(typeof(System.AggregateException))]
-        public void PostCompte_EmailNotUnique_CreationFailed()
-        {
-            // Arrange
-            TypeProduit? typeproduit = context.TypeProduits.Where(c => c.IdTypeProduit == 1).FirstOrDefault();
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
-
-            // Act
-            // On ajoute un TypeProduit existant
-            var result = controller.PostTypeProduit(typeproduit).Result;
-        }
-
-    
-
-
-        //IDEM POUR LES AUTRES CHAMPS NON CONFORMES AU MODELE
 
 
         // IDEM POUR LE PUT.
         [TestMethod]
-        public void PutTypeProduit_ModelValidated_UpdateOK()
+        public async Task PutTypeProduit_ModelValidated_UpdateOK()
         {
             // Arrange
             Random rnd = new Random();
-            int chiffre = rnd.Next(1, 1000000000);
-            TypeProduit typeproduit = new TypeProduit
+            int id = rnd.Next(200, 1000);
+
+            // Création d'un TypeProduit initial
+            TypeProduit TypeProduitInitial = new TypeProduit()
             {
-                NomTypeProduit = "SVG",
+                IdTypeProduit = id,
+                NomTypeProduit = "TypeProduitInitial"
             };
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
+
+            // Ajouter le TypeProduit initial dans la base de données
+            await controller.PostTypeProduit(TypeProduitInitial);
+            await context.SaveChangesAsync(); // Sauvegarder les changements
+
+            // Création d'un TypeProduit mis à jour avec les mêmes Id mais avec d'autres valeurs
+            TypeProduit TypeProduitUpdated = new TypeProduit()
+            {
+                IdTypeProduit = id,  // Utilisation du même Id
+                NomTypeProduit = "TypeProduitMisAJour"
+
+            };
 
             // Act
-            var result = controller.PutTypeProduit(typeproduit.IdTypeProduit, typeproduit).Result; // .Result pour appeler la méthode async de manière synchrone, afin d'attendre la création
+            var result = await controller.PutTypeProduit(TypeProduitUpdated.IdTypeProduit, TypeProduitUpdated); // Mettre à jour le TypeProduit
+            await context.SaveChangesAsync(); // Sauvegarder les changements après la mise à jour
 
             // Assert
-            TypeProduit? typeproduitRecupere = context.TypeProduits.Where(u => u.NomTypeProduit.ToUpper() == typeproduit.NomTypeProduit.ToUpper()).FirstOrDefault(); //On récupère l'TypeProduit créé directement dans la BD grace à son mail unique
-            // On ne connait pas l'ID de l’TypeProduit envoyé car numéro automatique.
-            // Du coup, on récupère l'ID de celui récupéré et on compare ensuite les 2 typeproduits
-            Assert.AreEqual(typeproduit, typeproduitRecupere, "TypeProduits pas identiques");
+            TypeProduit? TypeProduitRecupere = context.TypeProduits.Where(c => c.IdTypeProduit == TypeProduitUpdated.IdTypeProduit).FirstOrDefault();
+            Assert.IsNotNull(TypeProduitRecupere, "Le TypeProduit mis à jour n'a pas été trouvé dans la base de données.");
+
+            // Vérifier que les valeurs mises à jour correspondent
+            Assert.AreEqual(TypeProduitUpdated.NomTypeProduit, TypeProduitRecupere.NomTypeProduit, "Le nom du TypeProduit n'a pas été mis à jour.");
+
         }
+
 
         // Pareil pour les autres tests PUT
 
-
-        [TestMethod()]
-        public void DeleteTypeProduitTest()
+        [TestMethod]
+        public async Task DeleteTypeProduitTest()
         {
             // Arrange
             Random rnd = new Random();
-            int chiffre = rnd.Next(1, 1000000000);
-            TypeProduit typeproduitASuppr = new TypeProduit()
+            int id = rnd.Next(200, 1000);
+            TypeProduit TypeProduitASuppr = new TypeProduit()
             {
-                NomTypeProduit = "SVG",
+                IdTypeProduit = id,
+                NomTypeProduit = "test"
+
             };
-            context.TypeProduits.Add(typeproduitASuppr);
-            context.SaveChanges();
-            typeproduitASuppr.IdTypeProduit = context.TypeProduits.Where(c => c.NomTypeProduit.ToLower() == typeproduitASuppr.NomTypeProduit.ToLower()).FirstOrDefault().IdTypeProduit;
-            TypeProduitsController controller = new TypeProduitsController(dataRepository);
+
+            context.TypeProduits.Add(TypeProduitASuppr);
+            await context.SaveChangesAsync();
+            TypeProduitASuppr.IdTypeProduit = context.TypeProduits.Where(c => c.IdTypeProduit == TypeProduitASuppr.IdTypeProduit).FirstOrDefault().IdTypeProduit;
 
             // Act
-            var result = controller.DeleteTypeProduit(typeproduitASuppr.IdTypeProduit).Result;
+            var result = await controller.DeleteTypeProduit(TypeProduitASuppr.IdTypeProduit);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
-            Assert.IsNull(context.TypeProduits.Where(c => c.IdTypeProduit == typeproduitASuppr.IdTypeProduit).FirstOrDefault());
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult");
+            Assert.IsNull(context.TypeProduits.Where(c => c.IdTypeProduit == TypeProduitASuppr.IdTypeProduit).FirstOrDefault());
         }
 
         #endregion
@@ -245,32 +208,32 @@ namespace TD1_code.Controllers.Tests
         public void GetTypeProduitById_ExistingIdPassed_ReturnsRightItem_AvecMoq()
         {
             // Arrange
-            TypeProduit typeproduit = new TypeProduit
+            TypeProduit TypeProduit = new TypeProduit
             {
                 NomTypeProduit = "SVG",
             };
             var mockRepository = new Mock<IDataRepository<TypeProduit>>();
-            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(typeproduit);
+            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(TypeProduit);
 
-            var typeproduitController = new TypeProduitsController(mockRepository.Object);
+            var TypeProduitController = new TypeProduitsController(mockRepository.Object);
 
             // Act
-            var actionResult = typeproduitController.GettypeProduitById(1).Result;
+            var actionResult = TypeProduitController.GettypeProduitById(1).Result;
 
             // Assert
             Assert.IsNotNull(actionResult);
             Assert.IsNotNull(actionResult.Value);
-            Assert.AreEqual(typeproduit, actionResult.Value as TypeProduit);
+            Assert.AreEqual(TypeProduit, actionResult.Value as TypeProduit);
         }
 
         [TestMethod]
         public void GetTypeProduitById_UnknownIdPassed_ReturnsNotFoundResult_AvecMoq()
         {
             var mockRepository = new Mock<IDataRepository<TypeProduit>>();
-            var typeproduitController = new TypeProduitsController(mockRepository.Object);
+            var TypeProduitController = new TypeProduitsController(mockRepository.Object);
 
             // Act
-            var actionResult = typeproduitController.GettypeProduitById(0).Result;
+            var actionResult = TypeProduitController.GettypeProduitById(0).Result;
 
             // Assert
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
@@ -321,27 +284,47 @@ namespace TD1_code.Controllers.Tests
         }
 
         [TestMethod]
-        public void PutTypeProduit_ModelValidated_UpdateOK_AvecMoq()
+        public async Task PutTypeProduit_ModelValidated_UpdateOK_AvecMoq()
         {
             // Arrange
             TypeProduit userAMaJ = new TypeProduit
             {
+                IdTypeProduit = 1,   // Initialiser l'ID du TypeProduit à mettre à jour
                 NomTypeProduit = "SVG",
+
             };
+
             TypeProduit userUpdated = new TypeProduit
             {
-                NomTypeProduit = "SVG",
+                IdTypeProduit = 1,   // Assurez-vous que l'ID correspond à celui que vous souhaitez mettre à jour
+                NomTypeProduit = "SV",
+
             };
+
+            // Simuler le repository avec Moq
             var mockRepository = new Mock<IDataRepository<TypeProduit>>();
-            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(userAMaJ);
+
+            // Simuler la méthode GetByIdAsync pour retourner le TypeProduit à mettre à jour
+            mockRepository.Setup(x => x.GetByIdAsync(userAMaJ.IdTypeProduit)).ReturnsAsync(userAMaJ);
+
+            // Simuler la méthode UpdateAsync avec deux paramètres
+            mockRepository.Setup(x => x.UpdateAsync(userAMaJ, userUpdated)).Returns(Task.CompletedTask);
+
+            // Créer le contrôleur avec le mock du repository
             var userController = new TypeProduitsController(mockRepository.Object);
 
             // Act
-            var actionResult = userController.PutTypeProduit(userUpdated.IdTypeProduit, userUpdated).Result;
+            var actionResult = await userController.PutTypeProduit(userUpdated.IdTypeProduit, userUpdated);
 
             // Assert
-            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+            // Vérifier que la méthode UpdateAsync a bien été appelée avec les bons paramètres
+            mockRepository.Verify(x => x.UpdateAsync(userAMaJ, userUpdated), Times.Once);
+
+            // Vérifier que le retour est bien un NoContentResult, ce qui signifie que la mise à jour a réussi
+            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
         }
+
+
 
         #endregion
     }

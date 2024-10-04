@@ -28,7 +28,7 @@ namespace TD1_code.Controllers.Tests
         public void Init()
         {
             var builder = new DbContextOptionsBuilder<DBContexte>()
-                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
+                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
             context = new DBContexte(builder.Options);  // Assurer que le context est bien initialisé
             dataRepository = new ProduitManager(context);  // Initialiser ProduitManager avec le context
             controller = new ProduitsController(dataRepository);  // Utiliser le repository dans le contrôleur
