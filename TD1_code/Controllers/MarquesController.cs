@@ -38,7 +38,7 @@ namespace TD1_code.Controllers
 
             if(marque ==  null)
             {
-                return NotFound();
+                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             return marque;
         }
@@ -55,12 +55,12 @@ namespace TD1_code.Controllers
             var marqueToUpdate = await _marque.GetByIdAsync(id);
             if (marqueToUpdate == null)
             {
-                return NotFound();
+                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             else
             {
                 await _marque.UpdateAsync(marqueToUpdate.Value, marque);
-                return NoContent();
+                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
         }
 
@@ -72,7 +72,7 @@ namespace TD1_code.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
             await _marque.AddAsync(marque);
             return CreatedAtAction(nameof(GetMarqueById), new { id = marque.IdMarque }, marque); // GetById : nom de l’action
@@ -86,7 +86,7 @@ namespace TD1_code.Controllers
             var marque = await _marque.GetByIdAsync(id);
             if (marque == null)
             {
-                return NotFound();
+                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             await _marque.DeleteAsync(marque.Value);
             return NoContent();

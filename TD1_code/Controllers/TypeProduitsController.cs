@@ -38,7 +38,7 @@ namespace TD1_code.Controllers
 
             if (typeProduit == null)
             {
-                return NotFound();
+                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             return typeProduit;
         }
@@ -50,12 +50,12 @@ namespace TD1_code.Controllers
         {
             if (id != typeProduit.IdTypeProduit)
             {
-                return BadRequest();
+                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du type-produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
             var typeProduitToUpdate = await _typeProduit.GetByIdAsync(id);
             if (typeProduitToUpdate == null)
             {
-                return NotFound();
+                return NotFound("Erreur : La type-produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             else
             {
@@ -72,7 +72,7 @@ namespace TD1_code.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du type-produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
             await _typeProduit.AddAsync(typeProduit);
             return CreatedAtAction("GettypeProduitById", new { id = typeProduit.IdTypeProduit }, typeProduit); // GetById : nom de l’action
@@ -86,7 +86,7 @@ namespace TD1_code.Controllers
             var typeProduit = await _typeProduit.GetByIdAsync(id);
             if (typeProduit == null)
             {
-                return NotFound();
+                return NotFound("Erreur : La type-produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             await _typeProduit.DeleteAsync(typeProduit.Value);
             return NoContent();

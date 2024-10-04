@@ -38,7 +38,7 @@ namespace TD1_code.Controllers
 
             if (produit == null)
             {
-                return NotFound();
+                return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
             }
             return produit;
         }
@@ -72,11 +72,11 @@ namespace TD1_code.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
             await _produit.AddAsync(produit);
             return CreatedAtAction("GetProduitById", new { id = produit.IdProduit }, produit); // GetById : nom de l’action
@@ -90,7 +90,7 @@ namespace TD1_code.Controllers
             var produit = await _produit.GetByIdAsync(id);
             if (produit == null)
             {
-                return NotFound();
+                return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
             }
             await _produit.DeleteAsync(produit.Value);
             return NoContent();
