@@ -41,6 +41,20 @@ namespace TD1_code.Models.DataManager
             return await dBContext.Produits.ToListAsync();
         }
 
+        public async Task<IEnumerable<ProduitDto>> GetAllAsyncProduitDto()
+        {
+            var produits = await dBContext.Produits
+                                          .Include(p => p.IdTypeProduitNavigation)
+                                          .Include(p => p.IdMarqueNavigation)
+                                          .ToListAsync();
+
+            
+            // Mapper une liste de produits vers une liste de ProduitDto
+            IEnumerable<ProduitDto> produitDtos = _mapper.Map<IEnumerable<ProduitDto>>(produits);
+
+            return produitDtos;
+        }
+
         public async Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id)
         {
             var produit = await dBContext.Produits
@@ -57,21 +71,7 @@ namespace TD1_code.Models.DataManager
             return produitDetailDto;
         }
 
-        public async Task<ProduitDto> GetByIdAsyncProduitDto(int id)
-        {
-            var produit = await dBContext.Produits
-                                         .Include(p => p.IdTypeProduitNavigation)
-                                         .Include(p => p.IdMarqueNavigation)
-                                         .FirstOrDefaultAsync(p => p.IdProduit == id);
-
-            if (produit == null)
-            {
-                return null; // Produit non trouvé
-            }
-
-            ProduitDto produitDetailDto = _mapper.Map<ProduitDto>(produit);
-            return produitDetailDto;
-        }
+        
 
         public async Task<ActionResult<Produit>> GetByIdAsync(int id)
         {
@@ -91,10 +91,7 @@ namespace TD1_code.Models.DataManager
             return DPOproduit;
         }
 
-        public async Task<ActionResult<Produit>> GetByStringAsync(string str)
-        {
-            return await dBContext.Produits.FirstOrDefaultAsync(p => p.NomProduit.ToUpper() == str.ToUpper());
-        }
+        
 
         public async Task UpdateAsync(Produit entityToUpdate, Produit entity)
         {
@@ -113,5 +110,13 @@ namespace TD1_code.Models.DataManager
 
             await dBContext.SaveChangesAsync();
         }
+
+        public Task<ActionResult<Produit>> GetByStringAsync(string str)
+        {
+            throw new NotImplementedException();
+        }
+
+       
+       
     }
 }

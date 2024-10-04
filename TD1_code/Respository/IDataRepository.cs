@@ -36,8 +36,8 @@ namespace TD1_code.Respository
         #endregion
 
         #region DPO
+        Task<IEnumerable<ProduitDto>> GetAllAsyncProduitDto();
         Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id);
-        Task<ProduitDto> GetByIdAsyncProduitDto(int id);
         #endregion
     }
 

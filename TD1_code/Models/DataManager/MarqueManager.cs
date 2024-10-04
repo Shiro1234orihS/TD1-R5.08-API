@@ -61,5 +61,20 @@ namespace TD1_code.Models.DataManager
         {
             throw new NotImplementedException();
         }
+
+        public Task<ActionResult<ProduitDto>> GetProduitDtoAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ActionResult<ProduitDto>> GetAllAsyncProduitDto()
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<IEnumerable<ProduitDto>> IDataRepository<Marque>.GetAllAsyncProduitDto()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

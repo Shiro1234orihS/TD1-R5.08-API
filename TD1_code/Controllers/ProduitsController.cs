@@ -44,9 +44,26 @@ namespace TD1_code.Controllers
             return produit;
         }
 
+        // GET: produits/GeDpoProduit
+
+        [HttpGet]
+        [ActionName("GeDpoProduit")]
+        public async Task<ActionResult<IEnumerable<ProduitDto>>> GeDpoProduit()
+        {
+            var produits = await _produit.GetAllAsyncProduitDto();
+
+            if (produits == null || !produits.Any())
+            {
+                return NotFound("Erreur : Aucun produit trouvé.");
+            }
+
+            return Ok(produits);
+        }
+
+
         // GET: produits/Details/5
         [HttpGet("{id}")]
-        [ActionName("ProduitDetail")]
+        [ActionName("ProduitDetailID")]
         public async Task<ProduitDetailDto> GeProduitDetailById(int id)
         {
             var produit = await _produit.GetByIdAsyncProduitDetailDto(id);
@@ -56,20 +73,6 @@ namespace TD1_code.Controllers
             //}
             return produit;
         }
-
-        // GET: produits/Details/5
-        [HttpGet("{id}")]
-        [ActionName("GeDpoProduitById")]
-        public async Task<ProduitDto> GeDpoProduitById(int id)
-        {
-            var produit = await _produit.GetByIdAsyncProduitDto(id);
-            //if (produit == null)
-            //{
-            //    return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
-            //}
-            return produit;
-        }
-
 
         // PUT: api/PutProduit/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
