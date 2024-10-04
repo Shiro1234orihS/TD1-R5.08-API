@@ -57,6 +57,22 @@ namespace TD1_code.Models.DataManager
             return produitDetailDto;
         }
 
+        public async Task<ProduitDto> GetByIdAsyncProduitDto(int id)
+        {
+            var produit = await dBContext.Produits
+                                         .Include(p => p.IdTypeProduitNavigation)
+                                         .Include(p => p.IdMarqueNavigation)
+                                         .FirstOrDefaultAsync(p => p.IdProduit == id);
+
+            if (produit == null)
+            {
+                return null; // Produit non trouvé
+            }
+
+            ProduitDto produitDetailDto = _mapper.Map<ProduitDto>(produit);
+            return produitDetailDto;
+        }
+
         public async Task<ActionResult<Produit>> GetByIdAsync(int id)
         {
             return await dBContext.Produits.FirstOrDefaultAsync(p => p.IdProduit == id);

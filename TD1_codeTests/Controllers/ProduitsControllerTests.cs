@@ -11,6 +11,8 @@ using Moq;
 using TD1_code.Models.DataManager;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
+using AutoMapper;
+using TD1_code.Models.AutoMapper;
 
 namespace TD1_code.Controllers.Tests
 {
@@ -29,9 +31,15 @@ namespace TD1_code.Controllers.Tests
         {
             var builder = new DbContextOptionsBuilder<DBContexte>()
                 .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
-            context = new DBContexte(builder.Options);  // Assurer que le context est bien initialisé
-            dataRepository = new ProduitManager(context);  // Initialiser ProduitManager avec le context
-            controller = new ProduitsController(dataRepository);  // Utiliser le repository dans le contrôleur
+            context = new DBContexte(builder.Options);  
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MapperProduit()); 
+                cfg.AddProfile(new MapperMarque()); 
+            });
+            IMapper _mapper = config.CreateMapper();  
+            dataRepository = new ProduitManager(context, _mapper);  
+            controller = new ProduitsController(dataRepository); 
         }
 
         #region Test unitaires

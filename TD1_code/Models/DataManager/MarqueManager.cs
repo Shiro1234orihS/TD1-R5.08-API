@@ -56,5 +56,10 @@ namespace TD1_code.Models.DataManager
         {
             throw new NotImplementedException();
         }
+
+        public Task<ProduitDto> GetByIdAsyncProduitDto(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

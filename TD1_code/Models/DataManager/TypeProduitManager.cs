@@ -44,6 +44,11 @@ namespace TD1_code.Models.DataManager
             throw new NotImplementedException();
         }
 
+        public Task<ProduitDto> GetByIdAsyncProduitDto(int id)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<ActionResult<TypeProduit>> GetByStringAsync(string str)
         {
             return await dBContext.TypeProduits.FirstOrDefaultAsync(p => p.NomTypeProduit.ToUpper() == str.ToUpper());

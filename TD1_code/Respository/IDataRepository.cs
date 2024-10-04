@@ -33,7 +33,11 @@ namespace TD1_code.Respository
         #region DeleteAsync
         // Supprime de manière asynchrone une entité spécifiée du référentiel.
         Task DeleteAsync(TEntity entity);
+        #endregion
+
+        #region DPO
         Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id);
+        Task<ProduitDto> GetByIdAsyncProduitDto(int id);
         #endregion
     }
 
