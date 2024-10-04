@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TD1_code.Models.DPO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 
@@ -43,6 +44,20 @@ namespace TD1_code.Controllers
             return produit;
         }
 
+        // GET: produits/Details/5
+        [HttpGet("{id}")]
+        [ActionName("ProduitDetail")]
+        public async Task<ProduitDetailDto> GeProduitDetailById(int id)
+        {
+            var produit = await _produit.GetByIdAsyncProduitDetailDto(id);
+            //if (produit == null)
+            //{
+            //    return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
+            //}
+            return produit;
+        }
+
+
         // PUT: api/PutProduit/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -74,10 +89,7 @@ namespace TD1_code.Controllers
             {
                 return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
             }
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Erreur : L'ID fourni dans l'URL ne correspond pas à l'ID du produit. Veuillez vérifier les données saisies. Détails : " + ModelState);
-            }
+           
             await _produit.AddAsync(produit);
             return CreatedAtAction("GetProduitById", new { id = produit.IdProduit }, produit); // GetById : nom de l’action
         }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TD1_code.Models.DPO;
 using TD1_code.Models.EntityFramework;
@@ -10,13 +11,17 @@ namespace TD1_code.Models.DataManager
     public class ProduitManager : IDataRepository<Produit>
     {
         readonly DBContexte? dBContext;
+        private readonly IMapper _mapper;
+
 
         public ProduitManager() { }
 
-        public ProduitManager(DBContexte context)
+        public ProduitManager(DBContexte context , IMapper mapper)
         {
             dBContext = context;
+            _mapper = mapper;
         }
+       
 
         public async Task AddAsync(Produit entity)
         {
@@ -30,9 +35,26 @@ namespace TD1_code.Models.DataManager
             await dBContext.SaveChangesAsync();
         }
 
+
         public async Task<ActionResult<IEnumerable<Produit>>> GetAllAsync()
         {
             return await dBContext.Produits.ToListAsync();
+        }
+
+        public async Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id)
+        {
+            var produit = await dBContext.Produits
+                                         .Include(p => p.IdTypeProduitNavigation) 
+                                         .Include(p => p.IdMarqueNavigation)      
+                                         .FirstOrDefaultAsync(p => p.IdProduit == id);
+
+            if (produit == null)
+            {
+                return null; // Produit non trouvé
+            }
+
+            ProduitDetailDto produitDetailDto = _mapper.Map<ProduitDetailDto>(produit);
+            return produitDetailDto;
         }
 
         public async Task<ActionResult<Produit>> GetByIdAsync(int id)

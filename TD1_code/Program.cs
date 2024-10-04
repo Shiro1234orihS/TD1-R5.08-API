@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
+
 // Configuration CORS : Spécifiez le domaine de votre client (par exemple "https://localhost:7016")
 builder.Services.AddCors(options =>
 {
@@ -22,7 +23,7 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // Ajout du contexte de base de données
 builder.Services.AddDbContext<DBContexte>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DBContexte")));

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TD1_code.Models.DPO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 
@@ -49,6 +50,11 @@ namespace TD1_code.Models.DataManager
         {
             dBContext.Marques.Remove(entity);
             await dBContext.SaveChangesAsync();
+        }
+
+        public Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

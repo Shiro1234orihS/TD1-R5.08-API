@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TD1_code.Models.DPO;
 
 namespace TD1_code.Respository
 {
@@ -32,6 +33,7 @@ namespace TD1_code.Respository
         #region DeleteAsync
         // Supprime de manière asynchrone une entité spécifiée du référentiel.
         Task DeleteAsync(TEntity entity);
+        Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id);
         #endregion
     }
 

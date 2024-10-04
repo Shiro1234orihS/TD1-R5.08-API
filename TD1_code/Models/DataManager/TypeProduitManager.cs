@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TD1_code.Models.DPO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 
@@ -36,6 +37,11 @@ namespace TD1_code.Models.DataManager
         public async Task<ActionResult<TypeProduit>> GetByIdAsync(int id)
         {
             return await dBContext.TypeProduits.FirstOrDefaultAsync(p => p.IdTypeProduit == id);
+        }
+
+        public Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ActionResult<TypeProduit>> GetByStringAsync(string str)
