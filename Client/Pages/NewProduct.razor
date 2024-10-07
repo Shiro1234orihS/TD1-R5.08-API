@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
 
 <h3 class="mb-4">Ajouter un nouveau produit</h3>
-
+<p>Les différentes regex ont un bug, mais le post vers l'API fonctionne 👍</p>
 <div class="container">
     <form @onsubmit="OnSubmitProductAsync" @onsubmit:preventDefault="true">
         <!-- Nom du produit -->
@@ -44,6 +44,7 @@
                 }
                 else
                 {
+                    <option>Choisir un type de produit</option>
                     @foreach (var typeProduit in typeProduits)
                     {
                         <option value="@typeProduit.IdTypeProduit">@typeProduit.NomTypeProduit</option>
@@ -62,6 +63,7 @@
                 }
                 else
                 {
+                    <option>Choisir une marque</option>
                     @foreach (var marque in marques)
                     {
                         <option value="@marque.IdMarque">@marque.NomMarque</option>
