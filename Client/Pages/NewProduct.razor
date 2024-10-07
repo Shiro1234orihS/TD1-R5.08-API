@@ -1,6 +1,7 @@
 ﻿@page "/NewProduct"
 @using Client.Services
-@inject NavigationManager Navigation 
+@using System.Text.RegularExpressions
+@inject NavigationManager Navigation
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css">
@@ -9,26 +10,31 @@
 
 <div class="container">
     <form @onsubmit="OnSubmitProductAsync" @onsubmit:preventDefault="true">
+        <!-- Nom du produit -->
         <div class="mb-3">
             <label for="nomProduit" class="form-label">Nom du produit</label>
-            <input id="nomProduit" type="text" class="form-control" placeholder="Entrez le nom du produit" @bind="newProduct.NomProduit" />
+            <input id="nomProduit" type="text" class="form-control @GetValidationClass(isNomProduitValid)" placeholder="Entrez le nom du produit" @bind="newProduct.NomProduit" @oninput="ValidateNomProduit" />
         </div>
 
+        <!-- Description du produit -->
         <div class="mb-3">
             <label for="description" class="form-label">Description</label>
-            <input id="description" type="text" class="form-control" placeholder="Entrez la description du produit" @bind="newProduct.Description" />
+            <input id="description" type="text" class="form-control @GetValidationClass(isDescriptionValid)" placeholder="Entrez la description du produit" @bind="newProduct.Description" @oninput="ValidateDescription" />
         </div>
 
+        <!-- Nom de la photo -->
         <div class="mb-3">
             <label for="nomPhoto" class="form-label">Nom de la photo</label>
-            <input id="nomPhoto" type="text" class="form-control" placeholder="Entrez le nom de la photo" @bind="newProduct.NomPhoto" />
+            <input id="nomPhoto" type="text" class="form-control @GetValidationClass(isNomPhotoValid)" placeholder="Entrez le nom de la photo" @bind="newProduct.NomPhoto" @oninput="ValidateNomPhoto" />
         </div>
 
+        <!-- URI de la photo -->
         <div class="mb-3">
             <label for="uriPhoto" class="form-label">URI de la photo</label>
-            <input id="uriPhoto" type="text" class="form-control" placeholder="Entrez l'URI de la photo" @bind="newProduct.UriPhoto" />
+            <input id="uriPhoto" type="text" class="form-control @GetValidationClass(isUriPhotoValid)" placeholder="Entrez l'URI de la photo" @bind="newProduct.UriPhoto" @oninput="ValidateUriPhoto" />
         </div>
 
+        <!-- Type du produit -->
         <div class="mb-3">
             <label for="idTypeProduit" class="form-label">Choisissez un type de produit</label>
             <select id="idTypeProduit" class="form-select" @bind="newProduct.IdTypeProduit">
@@ -46,6 +52,7 @@
             </select>
         </div>
 
+        <!-- Marque du produit -->
         <div class="mb-3">
             <label for="idMarque" class="form-label">Choisissez une marque</label>
             <select id="idMarque" class="form-select" @bind="newProduct.IdMarque">
@@ -63,25 +70,27 @@
             </select>
         </div>
 
+        <!-- Stock réel -->
         <div class="mb-3">
             <label for="stockReel" class="form-label">Stock réel</label>
-            <input id="stockReel" type="number" class="form-control" placeholder="Entrez le stock réel" @bind="newProduct.StockReel" />
+            <input id="stockReel" type="number" class="form-control @GetValidationClass(isStockReelValid)" placeholder="Entrez le stock réel" @bind="newProduct.StockReel" @oninput="ValidateStockReel" />
         </div>
 
+        <!-- Stock minimum -->
         <div class="mb-3">
             <label for="stockMin" class="form-label">Stock minimum</label>
-            <input id="stockMin" type="number" class="form-control" placeholder="Entrez le stock minimum" @bind="newProduct.StockMin" />
+            <input id="stockMin" type="number" class="form-control @GetValidationClass(isStockMinValid)" placeholder="Entrez le stock minimum" @bind="newProduct.StockMin" @oninput="ValidateStockMin" />
         </div>
 
+        <!-- Stock maximum -->
         <div class="mb-3">
             <label for="stockMax" class="form-label">Stock maximum</label>
-            <input id="stockMax" type="number" class="form-control" placeholder="Entrez le stock maximum" @bind="newProduct.StockMax" />
+            <input id="stockMax" type="number" class="form-control @GetValidationClass(isStockMaxValid)" placeholder="Entrez le stock maximum" @bind="newProduct.StockMax" @oninput="ValidateStockMax" />
         </div>
 
         <button type="submit" class="btn btn-primary">Créer un produit</button>
     </form>
 
-    <!-- Affichage des messages d'erreur ou de succès -->
     @if (message != null)
     {
         <div class="alert alert-info mt-3">@message</div>
@@ -100,29 +109,29 @@
     private Client.Models.Produit newProduct = new Client.Models.Produit();
     private string message = null;
 
-    // Initialisation des données
+    // Variables de validation
+    private bool isNomProduitValid = true;
+    private bool isDescriptionValid = true;
+    private bool isNomPhotoValid = true;
+    private bool isUriPhotoValid = true;
+    private bool isStockReelValid = true;
+    private bool isStockMinValid = true;
+    private bool isStockMaxValid = true;
+
+
+
+
     protected override async Task OnInitializedAsync()
     {
         await LoadDataAsync();
     }
 
-    // Charger les marques et les types de produits
     private async Task LoadDataAsync()
     {
         marques = await marqueService.GetMarqueAsync("Marques/GetMarques");
         typeProduits = await typeProduitService.GetMarqueAsync("TypeProduits/GettypeProduits");
-
-        if (marques == null || marques.Count == 0)
-        {
-            marques = new List<Client.Models.Marque>();
-        }
-        if (typeProduits == null || typeProduits.Count == 0)
-        {
-            typeProduits = new List<Client.Models.TypeProduit>();
-        }
     }
 
-    // Méthode de soumission du formulaire
     private async Task OnSubmitProductAsync()
     {
         message = null;  // Reset du message
@@ -143,5 +152,52 @@
         {
             message = "Erreur lors de la création du produit. Veuillez réessayer.";
         }
+    }
+
+    private bool IsFormValid()
+    {
+        return isNomProduitValid && isDescriptionValid && isNomPhotoValid && isUriPhotoValid && isStockReelValid && isStockMinValid && isStockMaxValid;
+    }
+
+    // Méthodes de validation
+    private void ValidateNomProduit(ChangeEventArgs e)
+    {
+        isNomProduitValid = Regex.IsMatch(newProduct.NomProduit, "^[a-zA-ZÀ-ÿ0-9\\s\\-']{1,100}$");
+    }
+
+    private void ValidateDescription(ChangeEventArgs e)
+    {
+        isDescriptionValid = Regex.IsMatch(newProduct.Description, "^[a-zA-ZÀ-ÿ0-9\\s,;.'\\-]{1,255}$");
+    }
+
+    private void ValidateNomPhoto(ChangeEventArgs e)
+    {
+        isNomPhotoValid = Regex.IsMatch(newProduct.NomPhoto, "^[a-zA-Z0-9_\\-]+\\.(jpg|jpeg|png|gif)$");
+    }
+
+    private void ValidateUriPhoto(ChangeEventArgs e)
+    {
+        isUriPhotoValid = Regex.IsMatch(newProduct.UriPhoto, "^https?:\\/\\/[a-zA-Z0-9\\-._~:/?#@!$&'()*+,;=%]+$");
+    }
+
+    private void ValidateStockReel(ChangeEventArgs e)
+    {
+        isStockReelValid = Regex.IsMatch(newProduct.StockReel.ToString(), "^\\d+$");
+    }
+
+    private void ValidateStockMin(ChangeEventArgs e)
+    {
+        isStockMinValid = Regex.IsMatch(newProduct.StockMin.ToString(), "^\\d+$");
+    }
+
+    private void ValidateStockMax(ChangeEventArgs e)
+    {
+        isStockMaxValid = Regex.IsMatch(newProduct.StockMax.ToString(), "^\\d+$");
+    }
+
+    // Méthode pour ajouter les classes Bootstrap en fonction de la validité
+    private string GetValidationClass(bool isValid)
+    {
+        return isValid ? "is-valid" : "is-invalid";
     }
 }

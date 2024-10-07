@@ -39,7 +39,8 @@ namespace TD1_code.Controllers
 
             if (produit == null)
             {
-                return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
+                //return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
+                return NotFound();
             }
             return produit;
         }
@@ -54,7 +55,8 @@ namespace TD1_code.Controllers
 
             if (produits == null || !produits.Any())
             {
-                return NotFound("Erreur : Aucun produit trouvé.");
+                //return NotFound("Erreur : Aucun produit trouvé.");
+                return NotFound();
             }
 
             return Ok(produits);
@@ -118,7 +120,8 @@ namespace TD1_code.Controllers
             var produit = await _produit.GetByIdAsync(id);
             if (produit == null)
             {
-                return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
+                //return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
+                return NotFound();
             }
             await _produit.DeleteAsync(produit.Value);
             return NoContent();

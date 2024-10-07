@@ -38,7 +38,8 @@ namespace TD1_code.Controllers
 
             if(marque ==  null)
             {
-                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                //return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                return NotFound();
             }
             return marque;
         }
@@ -55,7 +56,8 @@ namespace TD1_code.Controllers
             var marqueToUpdate = await _marque.GetByIdAsync(id);
             if (marqueToUpdate == null)
             {
-                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                //return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                return NotFound();
             }
             else
             {

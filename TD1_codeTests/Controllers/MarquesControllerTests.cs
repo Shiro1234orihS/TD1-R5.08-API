@@ -168,7 +168,7 @@ namespace TD1_code.Controllers.Tests
 
             // Vérifier que les valeurs mises à jour correspondent
             Assert.AreEqual(MarqueUpdated.NomMarque, MarqueRecupere.NomMarque, "Le nom du Marque n'a pas été mis à jour.");
-           
+            await controller.DeleteMarque(id);
         }
 
 

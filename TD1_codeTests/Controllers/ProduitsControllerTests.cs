@@ -215,6 +215,8 @@ namespace TD1_code.Controllers.Tests
             Assert.AreEqual(ProduitUpdated.StockReel, ProduitRecupere.StockReel, "Le stock réel n'a pas été mis à jour.");
             Assert.AreEqual(ProduitUpdated.StockMin, ProduitRecupere.StockMin, "Le stock minimum n'a pas été mis à jour.");
             Assert.AreEqual(ProduitUpdated.StockMax, ProduitRecupere.StockMax, "Le stock maximum n'a pas été mis à jour.");
+
+            await controller.DeleteProduit(id);
         }
 
 

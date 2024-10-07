@@ -38,7 +38,8 @@ namespace TD1_code.Controllers
 
             if (typeProduit == null)
             {
-                return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                //return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                return NotFound();
             }
             return typeProduit;
         }
@@ -55,7 +56,8 @@ namespace TD1_code.Controllers
             var typeProduitToUpdate = await _typeProduit.GetByIdAsync(id);
             if (typeProduitToUpdate == null)
             {
-                return NotFound("Erreur : La type-produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                //return NotFound("Erreur : La type-produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                return NotFound();
             }
             else
             {
@@ -86,6 +88,7 @@ namespace TD1_code.Controllers
             var typeProduit = await _typeProduit.GetByIdAsync(id);
             if (typeProduit == null)
             {
+                return NotFound();
                 return NotFound("Erreur : La type-produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
             }
             await _typeProduit.DeleteAsync(typeProduit.Value);
