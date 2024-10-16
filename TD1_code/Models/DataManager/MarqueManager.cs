@@ -69,16 +69,17 @@ namespace TD1_code.Models.DataManager
 
         public async Task<MarqueDto> GetByIdAsyncMarqueDetailDto(int id)
         {
-            Marque marquerecherche = await dBContext.Marques.FirstOrDefaultAsync(p => p.IdMarque == id);
+            var marque = await dBContext.Marques
+                                     .Include(p => p.Produits)
+                                     .FirstOrDefaultAsync(p => p.IdMarque == id);
 
-            MarqueDto DPOmarque = new MarqueDto
+            if (marque == null)
             {
-                Id = marquerecherche.IdMarque,
-                Nom = marquerecherche.NomMarque
-               
-            };
+                return null; // Produit non trouvé
+            }
 
-            return DPOmarque;
+            MarqueDto marqueDto = _mapper.Map<MarqueDto>(marque);
+            return marqueDto;
         }
     }
 }
