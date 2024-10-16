@@ -1,6 +1,6 @@
 ﻿using TD1_code.Controllers;
 
-namespace TD1_code.Models.DPO
+namespace TD1_code.Models.DTO
 {
     public class MarqueDto
     {

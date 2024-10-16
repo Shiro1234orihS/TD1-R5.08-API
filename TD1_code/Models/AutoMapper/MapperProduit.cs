@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using TD1_code.Models.EntityFramework;
-using TD1_code.Models.DPO;
+using TD1_code.Models.DTO;
 
 namespace TD1_code.Models.AutoMapper
 {

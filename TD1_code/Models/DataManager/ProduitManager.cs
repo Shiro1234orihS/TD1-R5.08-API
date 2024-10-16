@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TD1_code.Models.DPO;
+using TD1_code.Models.DTO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 

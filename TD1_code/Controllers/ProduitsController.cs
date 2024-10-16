@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using TD1_code.Models.DPO;
+using TD1_code.Models.DTO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 
