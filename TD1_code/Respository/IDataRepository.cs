@@ -35,10 +35,7 @@ namespace TD1_code.Respository
         Task DeleteAsync(TEntity entity);
         #endregion
 
-        #region DPO
-        Task<IEnumerable<ProduitDto>> GetAllAsyncProduitDto();
-        Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id);
-        #endregion
+       
     }
 
 }

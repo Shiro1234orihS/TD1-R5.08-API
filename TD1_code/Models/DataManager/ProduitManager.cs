@@ -8,7 +8,7 @@ using TD1_code.Respository;
 
 namespace TD1_code.Models.DataManager
 {
-    public class ProduitManager : IDataRepository<Produit>
+    public class ProduitManager : IDataRepository<Produit>, IDataDpoProduit
     {
         readonly DBContexte? dBContext;
         private readonly IMapper _mapper;

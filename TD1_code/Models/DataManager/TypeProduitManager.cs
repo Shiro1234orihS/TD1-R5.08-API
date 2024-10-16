@@ -34,35 +34,19 @@ namespace TD1_code.Models.DataManager
             return await dBContext.TypeProduits.ToListAsync();
         }
 
-        public Task<IEnumerable<ProduitDto>> GetAllAsyncProduitDto()
-        {
-            throw new NotImplementedException();
-        }
-
+     
         public async Task<ActionResult<TypeProduit>> GetByIdAsync(int id)
         {
             return await dBContext.TypeProduits.FirstOrDefaultAsync(p => p.IdTypeProduit == id);
         }
 
-        public Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ProduitDto> GetByIdAsyncProduitDto(int id)
-        {
-            throw new NotImplementedException();
-        }
-
+       
         public async Task<ActionResult<TypeProduit>> GetByStringAsync(string str)
         {
             return await dBContext.TypeProduits.FirstOrDefaultAsync(p => p.NomTypeProduit.ToUpper() == str.ToUpper());
         }
 
-        public Task<ActionResult<ProduitDto>> GetProduitDtoAsync()
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public async Task UpdateAsync(TypeProduit entityToUpdate, TypeProduit entity)
         {

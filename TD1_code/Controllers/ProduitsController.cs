@@ -16,10 +16,12 @@ namespace TD1_code.Controllers
     public class ProduitsController : Controller
     {
         private readonly IDataRepository<Produit> _produit;
+        private readonly IDataDpoProduit _dataDPO;
 
-        public ProduitsController(IDataRepository<Produit> produit)
+        public ProduitsController(IDataRepository<Produit> produit ,IDataDpoProduit dataDPO)
         {
             this._produit = produit;
+            this._dataDPO = dataDPO;
         }
 
         [HttpGet]
@@ -51,7 +53,7 @@ namespace TD1_code.Controllers
         [ActionName("GeDpoProduit")]
         public async Task<ActionResult<IEnumerable<ProduitDto>>> GeDpoProduit()
         {
-            var produits = await _produit.GetAllAsyncProduitDto();
+            var produits = await _dataDPO.GetAllAsyncProduitDto();
 
             if (produits == null || !produits.Any())
             {
@@ -68,7 +70,7 @@ namespace TD1_code.Controllers
         [ActionName("ProduitDetailID")]
         public async Task<ProduitDetailDto> GeProduitDetailById(int id)
         {
-            var produit = await _produit.GetByIdAsyncProduitDetailDto(id);
+            var produit = await _dataDPO.GetByIdAsyncProduitDetailDto(id);
             //if (produit == null)
             //{
             //    return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
