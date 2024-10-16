@@ -14,9 +14,10 @@ namespace TD1_code.Models.DataManager
         private readonly IMapper _mapper;
         public MarqueManager() { }
 
-        public MarqueManager(DBContexte context)
+        public MarqueManager(DBContexte context, IMapper mapper)
         {
             dBContext = context;
+            _mapper = mapper;
         }
 
         public async Task<ActionResult<IEnumerable<Marque>>> GetAllAsync()

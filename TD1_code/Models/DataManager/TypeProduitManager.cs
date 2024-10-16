@@ -14,9 +14,10 @@ namespace TD1_code.Models.DataManager
 
         public TypeProduitManager() { }
 
-        public TypeProduitManager(DBContexte context)
+        public TypeProduitManager(DBContexte context, IMapper mapper)
         {
             dBContext = context;
+            _mapper = mapper;
         }
 
         public async Task AddAsync(TypeProduit entity)
