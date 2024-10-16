@@ -16,9 +16,9 @@ namespace TD1_code.Controllers
     public class ProduitsController : Controller
     {
         private readonly IDataRepository<Produit> _produit;
-        private readonly IDataDpoProduit _dataDPO;
+        private readonly IDataDtoProduit _dataDPO;
 
-        public ProduitsController(IDataRepository<Produit> produit ,IDataDpoProduit dataDPO)
+        public ProduitsController(IDataRepository<Produit> produit ,IDataDtoProduit dataDPO)
         {
             this._produit = produit;
             this._dataDPO = dataDPO;

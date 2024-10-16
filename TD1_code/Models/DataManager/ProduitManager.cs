@@ -8,7 +8,7 @@ using TD1_code.Respository;
 
 namespace TD1_code.Models.DataManager
 {
-    public class ProduitManager : IDataRepository<Produit>, IDataDpoProduit
+    public class ProduitManager : IDataRepository<Produit>, IDataDtoProduit
     {
         readonly DBContexte? dBContext;
         private readonly IMapper _mapper;
@@ -80,7 +80,7 @@ namespace TD1_code.Models.DataManager
 
         public async Task<ActionResult<ProduitDto>> GetProduitDtoAsync(int id) 
         {
-            Produit produitrecherche = await dBContext.Produits.FirstOrDefaultAsync(p => p.IdMarque == id);
+            Produit produitrecherche = await dBContext.Produits.FirstOrDefaultAsync(p => p.IdProduit == id);
 
             ProduitDto DPOproduit = new ProduitDto
             {

@@ -2,7 +2,7 @@
 
 namespace TD1_code.Respository
 {
-    public interface IDataDpoProduit
+    public interface IDataDtoProduit
     {
         #region DPO
         Task<IEnumerable<ProduitDto>> GetAllAsyncProduitDto();

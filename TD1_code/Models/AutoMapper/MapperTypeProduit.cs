@@ -10,7 +10,7 @@ namespace TD1_code.Models.AutoMapper
         {
             CreateMap<TypeProduit, TypeProduitDto>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.IdTypeProduit))
-                .ForMember(dest => dest.Nom, opt => opt.MapFrom(src => src.NomTypeProduit))
+                .ForMember(dest => dest.Nom, opt => opt.MapFrom(src => src.NomTypeProduit));
         }
     }
 }
