@@ -30,9 +30,14 @@ builder.Services.AddDbContext<DBContexte>(options =>
 
 // Dépendances pour les services
 builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitManager>();
+builder.Services.AddScoped<IDataDtoTypeProduit, TypeProduitManager>();
+
 builder.Services.AddScoped<IDataRepository<Marque>, MarqueManager>();
+builder.Services.AddScoped<IDataDtoMarque, MarqueManager>();
+
 builder.Services.AddScoped<IDataRepository<Produit>, ProduitManager>();
 builder.Services.AddScoped<IDataDtoProduit,ProduitManager>();
+
 
 var app = builder.Build();
 

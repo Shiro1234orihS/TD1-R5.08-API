@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TD1_code.Models.DTO;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 
@@ -15,10 +16,12 @@ namespace TD1_code.Controllers
     public class TypeProduitsController : Controller
     {
         private readonly IDataRepository<TypeProduit> _typeProduit;
+        private readonly IDataDtoTypeProduit _dataDPO;
 
-        public TypeProduitsController(IDataRepository<TypeProduit> TypeProdui)
+        public TypeProduitsController(IDataRepository<TypeProduit> TypeProdui, IDataDtoTypeProduit dataDPO)
         {
             this._typeProduit = TypeProdui;
+            _dataDPO = dataDPO;
         }
 
         [HttpGet]
@@ -38,10 +41,39 @@ namespace TD1_code.Controllers
 
             if (typeProduit == null)
             {
-                //return NotFound("Erreur : La marque avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
+                //return NotFound("Erreur : La TypeProduit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
                 return NotFound();
             }
             return typeProduit;
+        }
+        // GET: TypeProduits/GeDpoTypeProduit
+        [HttpGet]
+        [ActionName("GeDpoTypeProduit")]
+        public async Task<ActionResult<IEnumerable<TypeProduitDto>>> GeDpoTypeProduit()
+        {
+            var TypeProduits = await _dataDPO.GetAllAsyncTypeProduitDto();
+
+            if (TypeProduits == null || !TypeProduits.Any())
+            {
+                //return NotFound("Erreur : Aucun TypeProduit trouvé.");
+                return NotFound();
+            }
+
+            return Ok(TypeProduits);
+        }
+
+
+        // GET: TypeProduits/Details/5
+        [HttpGet("{id}")]
+        [ActionName("TypeProduitDetailID")]
+        public async Task<TypeProduitDto> GeTypeProduitDetailById(int id)
+        {
+            var TypeProduit = await _dataDPO.GetByIdAsyncTypeProduitDetailDto(id);
+            //if (TypeProduit == null)
+            //{
+            //    return NotFound("Erreur : Le TypeProduit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
+            //}
+            return TypeProduit;
         }
 
         // PUT: api/Utilisateurs/5
