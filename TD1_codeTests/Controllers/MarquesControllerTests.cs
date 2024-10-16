@@ -11,9 +11,11 @@ using Moq;
 using TD1_code.Models.DataManager;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
+using AutoMapper;
 
 namespace TD1_code.Controllers.Tests
 {
+    //bug avec les test  unitaires, je suis entrain de les faire 
     [TestClass()]
     public class MarquesControllerTests
     {
@@ -22,16 +24,32 @@ namespace TD1_code.Controllers.Tests
         private MarquesController controller;
         private DBContexte context;
         private IDataRepository<Marque> dataRepository;
+        private IDataDtoProduit dataDtoProduit;
+        private IMapper mapper;
         #endregion
 
         [TestInitialize]
         public void Init()
         {
+            // Utilisation d'une base de données en mémoire pour simplifier les tests unitaires
             var builder = new DbContextOptionsBuilder<DBContexte>()
-                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
-            context = new DBContexte(builder.Options);  // Assurer que le context est bien initialisé
-            dataRepository = new MarqueManager(context);  // Initialiser MarqueManager avec le context
-            controller = new MarquesController(dataRepository);  // Utiliser le repository dans le contrôleur
+                .UseInMemoryDatabase("TD1_cod");  // Utilisation d'une base de données en mémoire pour les tests
+
+            context = new DBContexte(builder.Options);
+
+            // Configuration de l'objet IMapper avec AutoMapper
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile()); // Ajoutez ici votre profil de mapping
+            });
+            mapper = mappingConfig.CreateMapper();
+
+            // Initialisation des dépendances
+            dataRepository = new MarqueManager(context, mapper);  // Initialiser MarqueManager avec le contexte
+            dataDtoProduit = new ProduitManager(context, mapper); // Assurez-vous que ProduitManager est bien la classe correcte
+
+            // Initialisation du contrôleur avec les dépendances
+            controller = new MarquesController(dataRepository, dataDtoProduit);
         }
 
         #region Test unitaires
@@ -324,6 +342,11 @@ namespace TD1_code.Controllers.Tests
             Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
         }
 
+
+
+        #endregion
+
+        #region Test de DTO
 
 
         #endregion
