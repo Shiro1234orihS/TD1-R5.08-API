@@ -50,8 +50,8 @@ namespace TD1_code.Controllers
         // GET: produits/GeDpoProduit
 
         [HttpGet]
-        [ActionName("GeDpoProduit")]
-        public async Task<ActionResult<IEnumerable<ProduitDto>>> GeDpoProduit()
+        [ActionName("GetDpoProduit")]
+        public async Task<ActionResult<IEnumerable<ProduitDto>>> GetDpoProduit()
         {
             var produits = await _dataDPO.GetAllAsyncProduitDto();
 
@@ -68,14 +68,14 @@ namespace TD1_code.Controllers
         // GET: produits/Details/5
         [HttpGet("{id}")]
         [ActionName("ProduitDetailID")]
-        public async Task<ProduitDetailDto> GeProduitDetailById(int id)
+        public async Task<ActionResult<ProduitDetailDto>> GetProduitDetailById(int id)
         {
             var produit = await _dataDPO.GetByIdAsyncProduitDetailDto(id);
-            //if (produit == null)
-            //{
-            //    return NotFound("Erreur : Le produit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis.");
-            //}
-            return produit;
+            if (produit == null)
+            {
+                return NotFound(); // Renvoie un 404 si le produit n'est pas trouvé
+            }
+            return Ok(produit); // Renvoie un 200 avec le produit trouvé
         }
 
         // PUT: api/PutProduit/5

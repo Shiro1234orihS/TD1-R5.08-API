@@ -12,6 +12,7 @@ using TD1_code.Models.DataManager;
 using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 using AutoMapper;
+using TD1_code.Models.AutoMapper;
 
 namespace TD1_code.Controllers.Tests
 {
@@ -19,336 +20,335 @@ namespace TD1_code.Controllers.Tests
     [TestClass()]
     public class MarquesControllerTests
     {
-        //#region Private Fields
-        //// Déclaration des variables nécessaires pour les tests
-        //private MarquesController controller;
-        //private DBContexte context;
-        //private IDataRepository<Marque> dataRepository;
-        //private IDataDtoProduit dataDtoProduit;
-        //private IMapper mapper;
-        //#endregion
+        #region Private Fields
+        // Déclaration des variables nécessaires pour les tests
+        private MarquesController controller;
+        private DBContexte context;
+        private IDataRepository<Marque> dataRepository;
+        private IDataDtoMarque dataDPO;
+        private IMapper _mapper;
+        #endregion
 
-        //[TestInitialize]
-        //public void Init()
-        //{
-        //    // Utilisation d'une base de données en mémoire pour simplifier les tests unitaires
-        //    var builder = new DbContextOptionsBuilder<DBContexte>()
-        //        .UseInMemoryDatabase("TD1_cod");  // Utilisation d'une base de données en mémoire pour les tests
+        [TestInitialize]
+        public void Init()
+        {
+            var builder = new DbContextOptionsBuilder<DBContexte>()
+                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
+            context = new DBContexte(builder.Options);
 
-        //    context = new DBContexte(builder.Options);
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MapperProduit());
+                cfg.AddProfile(new MapperMarque());
+                cfg.AddProfile(new MapperTypeProduit());
+            });
 
-        //    // Configuration de l'objet IMapper avec AutoMapper
-        //    var mappingConfig = new MapperConfiguration(mc =>
-        //    {
-        //        mc.AddProfile(new MappingProfile()); // Ajoutez ici votre profil de mapping
-        //    });
-        //    mapper = mappingConfig.CreateMapper();
+            _mapper = config.CreateMapper();
+            dataRepository = new MarqueManager(context, _mapper);
 
-        //    // Initialisation des dépendances
-        //    dataRepository = new MarqueManager(context, mapper);  // Initialiser MarqueManager avec le contexte
-        //    dataDtoProduit = new ProduitManager(context, mapper); // Assurez-vous que ProduitManager est bien la classe correcte
+            // Instanciation correcte de dataDPO
+            dataDPO = new MarqueManager(context, _mapper);
 
-        //    // Initialisation du contrôleur avec les dépendances
-        //    controller = new MarquesController(dataRepository, dataDtoProduit);
-        //}
+            controller = new MarquesController(dataRepository, dataDPO);
+        }
 
-        //#region Test unitaires
+        #region Test unitaires
 
-        //[TestMethod]
-        //public async Task GetMarques_ReturnsRightItems()
-        //{
-        //    // Act
-        //    var result = await controller.GetMarques();  // Attendre la réponse
+        [TestMethod]
+        public async Task GetMarques_ReturnsRightItems()
+        {
+            // Act
+            var result = await controller.GetMarques();  // Attendre la réponse
 
-        //    List<Marque> expected = context.Marques.ToList();  // Marques attendus dans la base
+            List<Marque> expected = context.Marques.ToList();  // Marques attendus dans la base
 
-        //    // Assert
-        //    Assert.IsInstanceOfType(result, typeof(ActionResult<IEnumerable<Marque>>), "Pas un ActionResult");
-        //    var actionResult = result as ActionResult<IEnumerable<Marque>>;
-        //    Assert.IsNotNull(actionResult, "ActionResult null");
-        //    Assert.IsNotNull(actionResult.Value, "Valeur nulle");
-        //    CollectionAssert.AreEqual(expected, (List<Marque>)actionResult.Value, "Pas les mêmes Marques");
-        //}
-
-
-        //[TestMethod]
-        //public async Task GetMarqueById_ExistingIdPassed_ReturnsRightItem()
-        //{
-        //    // Act
-        //    var result = await controller.GetMarqueById(1);
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(result, typeof(ActionResult<Marque>), "Pas un ActionResult");
-        //    var actionResult = result as ActionResult<Marque>;
-        //    Assert.IsNotNull(actionResult, "ActionResult null");
-        //    Assert.IsNotNull(actionResult.Value, "Valeur nulle");
-        //    Assert.IsInstanceOfType(actionResult.Value, typeof(Marque), "Pas un Marque");
-        //    Assert.AreEqual(context.Marques.Where(c => c.IdMarque == 1).FirstOrDefault(),
-        //        (Marque)actionResult.Value, "Marques pas identiques");
-        //}
-
-        //[TestMethod]
-        //public async Task GetMarqueById_UnknownIdPassed_ReturnsNotFoundResult()
-        //{
-        //    // Act
-        //    var result = await controller.GetMarqueById(0);  // Attendre la réponse
-
-        //    // Assert
-        //    Assert.IsInstanceOfType(result, typeof(ActionResult<Marque>), "Pas un ActionResult");
-        //    Assert.IsNull(result.Value, "Marque pas null");
-        //}
-
-        //[TestMethod]
-        //public async Task PostMarque_ModelValidated_CreationOK()
-        //{
-        //    // Arrange
-        //    Random rnd = new Random();
-        //    int id = rnd.Next(200, 1000);
-
-        //    Marque MarqueAtester = new Marque()
-        //    {
-        //        IdMarque = id,
-        //        NomMarque = "test"
-        //    };
-
-        //    // Act
-        //    var postResult = await controller.PostMarque(MarqueAtester);
-
-        //    // Sauvegarder les changements dans le contexte pour s'assurer que l'ajout est persistant
-        //    await context.SaveChangesAsync();
-
-        //    // Assert
-        //    // Vérifier si le Marque a été correctement ajouté à la base de données
-        //    Marque? MarqueRecupere = context.Marques.Where(u => u.IdMarque == MarqueAtester.IdMarque).FirstOrDefault();
-        //    Assert.IsNotNull(MarqueRecupere, "Le Marque n'a pas été trouvé dans la base de données.");
-
-        //    // Vérifier que les Marques sont identiques
-        //    Assert.AreEqual(MarqueAtester, MarqueRecupere, "Les Marques ne correspondent pas.");
-        //    // Ajouter d'autres comparaisons si nécessaire pour les autres propriétés du Marque.
-        //    await controller.DeleteMarque(id);
-        //}
-
-        //[TestMethod]
-        //[ExpectedException(typeof(Microsoft.EntityFrameworkCore.DbUpdateException))]
-        //public async Task PostMarque_CreationFailed()
-        //{
-        //    // Arrange
-        //    Random rnd = new Random();
-        //    int id = rnd.Next(200, 1000);
-
-        //    // Créer un Marque invalide (par exemple, sans nom)
-        //    Marque MarqueAtester = new Marque()
-        //    {
-        //        IdMarque = id,
-        //        NomMarque = null,  // Cela devrait provoquer une exception car le nom est requis
-        //    };
-
-        //    // Act
-        //    // Cette ligne devrait lancer une exception, car le Marque n'est pas valide
-        //    await controller.PostMarque(MarqueAtester);
-        //}
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ActionResult<IEnumerable<Marque>>), "Pas un ActionResult");
+            var actionResult = result as ActionResult<IEnumerable<Marque>>;
+            Assert.IsNotNull(actionResult, "ActionResult null");
+            Assert.IsNotNull(actionResult.Value, "Valeur nulle");
+            CollectionAssert.AreEqual(expected, (List<Marque>)actionResult.Value, "Pas les mêmes Marques");
+        }
 
 
-        //// IDEM POUR LE PUT.
-        //[TestMethod]
-        //public async Task PutMarque_ModelValidated_UpdateOK()
-        //{
-        //    // Arrange
-        //    Random rnd = new Random();
-        //    int id = rnd.Next(200, 1000);
+        [TestMethod]
+        public async Task GetMarqueById_ExistingIdPassed_ReturnsRightItem()
+        {
+            // Act
+            var result = await controller.GetMarqueById(1);
 
-        //    // Création d'un Marque initial
-        //    Marque MarqueInitial = new Marque()
-        //    {
-        //        IdMarque = id,
-        //        NomMarque = "MarqueInitial"
-        //    };
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ActionResult<Marque>), "Pas un ActionResult");
+            var actionResult = result as ActionResult<Marque>;
+            Assert.IsNotNull(actionResult, "ActionResult null");
+            Assert.IsNotNull(actionResult.Value, "Valeur nulle");
+            Assert.IsInstanceOfType(actionResult.Value, typeof(Marque), "Pas un Marque");
+            Assert.AreEqual(context.Marques.Where(c => c.IdMarque == 1).FirstOrDefault(),
+                (Marque)actionResult.Value, "Marques pas identiques");
+        }
 
-        //    // Ajouter le Marque initial dans la base de données
-        //    await controller.PostMarque(MarqueInitial);
-        //    await context.SaveChangesAsync(); // Sauvegarder les changements
+        [TestMethod]
+        public async Task GetMarqueById_UnknownIdPassed_ReturnsNotFoundResult()
+        {
+            // Act
+            var result = await controller.GetMarqueById(0);  // Attendre la réponse
 
-        //    // Création d'un Marque mis à jour avec les mêmes Id mais avec d'autres valeurs
-        //    Marque MarqueUpdated = new Marque()
-        //    {
-        //        IdMarque = id,  // Utilisation du même Id
-        //        NomMarque = "MarqueMisAJour"
-              
-        //    };
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ActionResult<Marque>), "Pas un ActionResult");
+            Assert.IsNull(result.Value, "Marque pas null");
+        }
 
-        //    // Act
-        //    var result = await controller.PutMarque(MarqueUpdated.IdMarque, MarqueUpdated); // Mettre à jour le Marque
-        //    await context.SaveChangesAsync(); // Sauvegarder les changements après la mise à jour
+        [TestMethod]
+        public async Task PostMarque_ModelValidated_CreationOK()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int id = rnd.Next(200, 1000);
 
-        //    // Assert
-        //    Marque? MarqueRecupere = context.Marques.Where(c => c.IdMarque == MarqueUpdated.IdMarque).FirstOrDefault();
-        //    Assert.IsNotNull(MarqueRecupere, "Le Marque mis à jour n'a pas été trouvé dans la base de données.");
+            Marque MarqueAtester = new Marque()
+            {
+                IdMarque = id,
+                NomMarque = "test"
+            };
 
-        //    // Vérifier que les valeurs mises à jour correspondent
-        //    Assert.AreEqual(MarqueUpdated.NomMarque, MarqueRecupere.NomMarque, "Le nom du Marque n'a pas été mis à jour.");
-        //    await controller.DeleteMarque(id);
-        //}
+            // Act
+            var postResult = await controller.PostMarque(MarqueAtester);
+
+            // Sauvegarder les changements dans le contexte pour s'assurer que l'ajout est persistant
+            await context.SaveChangesAsync();
+
+            // Assert
+            // Vérifier si le Marque a été correctement ajouté à la base de données
+            Marque? MarqueRecupere = context.Marques.Where(u => u.IdMarque == MarqueAtester.IdMarque).FirstOrDefault();
+            Assert.IsNotNull(MarqueRecupere, "Le Marque n'a pas été trouvé dans la base de données.");
+
+            // Vérifier que les Marques sont identiques
+            Assert.AreEqual(MarqueAtester, MarqueRecupere, "Les Marques ne correspondent pas.");
+            // Ajouter d'autres comparaisons si nécessaire pour les autres propriétés du Marque.
+            await controller.DeleteMarque(id);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Microsoft.EntityFrameworkCore.DbUpdateException))]
+        public async Task PostMarque_CreationFailed()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int id = rnd.Next(200, 1000);
+
+            // Créer un Marque invalide (par exemple, sans nom)
+            Marque MarqueAtester = new Marque()
+            {
+                IdMarque = id,
+                NomMarque = null,  // Cela devrait provoquer une exception car le nom est requis
+            };
+
+            // Act
+            // Cette ligne devrait lancer une exception, car le Marque n'est pas valide
+            await controller.PostMarque(MarqueAtester);
+        }
 
 
-        //// Pareil pour les autres tests PUT
+        // IDEM POUR LE PUT.
+        [TestMethod]
+        public async Task PutMarque_ModelValidated_UpdateOK()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int id = rnd.Next(200, 1000);
 
-        //[TestMethod]
-        //public async Task DeleteMarqueTest()
-        //{
-        //    // Arrange
-        //    Random rnd = new Random();
-        //    int id = rnd.Next(200, 1000);
-        //    Marque MarqueASuppr = new Marque()
-        //    {
-        //        IdMarque = id,
-        //        NomMarque = "test"
-               
-        //    };
+            // Création d'un Marque initial
+            Marque MarqueInitial = new Marque()
+            {
+                IdMarque = id,
+                NomMarque = "MarqueInitial"
+            };
 
-        //    context.Marques.Add(MarqueASuppr);
-        //    await context.SaveChangesAsync();
-        //    MarqueASuppr.IdMarque = context.Marques.Where(c => c.IdMarque == MarqueASuppr.IdMarque).FirstOrDefault().IdMarque;
+            // Ajouter le Marque initial dans la base de données
+            await controller.PostMarque(MarqueInitial);
+            await context.SaveChangesAsync(); // Sauvegarder les changements
 
-        //    // Act
-        //    var result = await controller.DeleteMarque(MarqueASuppr.IdMarque);
+            // Création d'un Marque mis à jour avec les mêmes Id mais avec d'autres valeurs
+            Marque MarqueUpdated = new Marque()
+            {
+                IdMarque = id,  // Utilisation du même Id
+                NomMarque = "MarqueMisAJour"
+            
+            };
 
-        //    // Assert
-        //    Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult");
-        //    Assert.IsNull(context.Marques.Where(c => c.IdMarque == MarqueASuppr.IdMarque).FirstOrDefault());
-        //}
+            // Act
+            var result = await controller.PutMarque(MarqueUpdated.IdMarque, MarqueUpdated); // Mettre à jour le Marque
+            await context.SaveChangesAsync(); // Sauvegarder les changements après la mise à jour
 
-        //#endregion
+            // Assert
+            Marque? MarqueRecupere = context.Marques.Where(c => c.IdMarque == MarqueUpdated.IdMarque).FirstOrDefault();
+            Assert.IsNotNull(MarqueRecupere, "Le Marque mis à jour n'a pas été trouvé dans la base de données.");
+
+            // Vérifier que les valeurs mises à jour correspondent
+            Assert.AreEqual(MarqueUpdated.NomMarque, MarqueRecupere.NomMarque, "Le nom du Marque n'a pas été mis à jour.");
+            await controller.DeleteMarque(id);
+        }
 
 
-        //#region Tests de substitution
+        // Pareil pour les autres tests PUT
 
-        //[TestMethod]
-        //public void GetMarqueById_ExistingIdPassed_ReturnsRightItem_AvecMoq()
-        //{
-        //    // Arrange
-        //    Marque Marque = new Marque
-        //    {
-        //        NomMarque = "SVG",
-        //    };
-        //    var mockRepository = new Mock<IDataRepository<Marque>>();
-        //    mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(Marque);
+        [TestMethod]
+        public async Task DeleteMarqueTest()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int id = rnd.Next(200, 1000);
+            Marque MarqueASuppr = new Marque()
+            {
+                IdMarque = id,
+                NomMarque = "test"
+             
+            };
 
-        //    var MarqueController = new MarquesController(mockRepository.Object);
+            context.Marques.Add(MarqueASuppr);
+            await context.SaveChangesAsync();
+            MarqueASuppr.IdMarque = context.Marques.Where(c => c.IdMarque == MarqueASuppr.IdMarque).FirstOrDefault().IdMarque;
 
-        //    // Act
-        //    var actionResult = MarqueController.GetMarqueById(1).Result;
+            // Act
+            var result = await controller.DeleteMarque(MarqueASuppr.IdMarque);
 
-        //    // Assert
-        //    Assert.IsNotNull(actionResult);
-        //    Assert.IsNotNull(actionResult.Value);
-        //    Assert.AreEqual(Marque, actionResult.Value as Marque);
-        //}
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult");
+            Assert.IsNull(context.Marques.Where(c => c.IdMarque == MarqueASuppr.IdMarque).FirstOrDefault());
+        }
 
-        //[TestMethod]
-        //public void GetMarqueById_UnknownIdPassed_ReturnsNotFoundResult_AvecMoq()
-        //{
-        //    var mockRepository = new Mock<IDataRepository<Marque>>();
-        //    var MarqueController = new MarquesController(mockRepository.Object);
+        #endregion
 
-        //    // Act
-        //    var actionResult = MarqueController.GetMarqueById(0).Result;
 
-        //    // Assert
-        //    Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
-        //}
+        #region Tests de substitution
 
-        //[TestMethod]
-        //public void PostMarque_ModelValidated_CreationOK_AvecMoq()
-        //{
-        //    // Arrange
-        //    var mockRepository = new Mock<IDataRepository<Marque>>();
-        //    var userController = new MarquesController(mockRepository.Object);
+        [TestMethod]
+        public void GetMarqueById_ExistingIdPassed_ReturnsRightItem_AvecMoq()
+        {
+            // Arrange
+            Marque Marque = new Marque
+            {
+                NomMarque = "SVG",
+            };
+            var mockRepository = new Mock<IDataRepository<Marque>>();
+            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(Marque);
 
-        //    Marque user = new Marque
-        //    {
-        //        NomMarque = "SVG"
-        //    };
+            var MarqueController = new MarquesController(mockRepository.Object , dataDPO);
 
-        //    // Act
-        //    var actionResult = userController.PostMarque(user).Result;
+            // Act
+            var actionResult = MarqueController.GetMarqueById(1).Result;
 
-        //    // Assert
-        //    Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Marque>), "Pas un ActionResult<Marque>");
-        //    Assert.IsInstanceOfType(actionResult.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
-        //    var result = actionResult.Result as CreatedAtActionResult;
-        //    Assert.IsInstanceOfType(result.Value, typeof(Marque), "Pas un Marque");
-        //    user.IdMarque = ((Marque)result.Value).IdMarque;
-        //    Assert.AreEqual(user, (Marque)result.Value, "Marques pas identiques");
-        //}
+            // Assert
+            Assert.IsNotNull(actionResult);
+            Assert.IsNotNull(actionResult.Value);
+            Assert.AreEqual(Marque, actionResult.Value as Marque);
+        }
 
-        //[TestMethod]
-        //public void DeleteMarqueTest_AvecMoq()
-        //{
-        //    // Arrange
-        //    Marque user = new Marque
-        //    {
-        //        NomMarque = "SVG",
-        //    };
+        [TestMethod]
+        public void GetMarqueById_UnknownIdPassed_ReturnsNotFoundResult_AvecMoq()
+        {
+            var mockRepository = new Mock<IDataRepository<Marque>>();
+            var MarqueController = new MarquesController(mockRepository.Object , dataDPO);
 
-        //    var mockRepository = new Mock<IDataRepository<Marque>>();
-        //    mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(user);
-        //    var userController = new MarquesController(mockRepository.Object);
+            // Act
+            var actionResult = MarqueController.GetMarqueById(0).Result;
 
-        //    // Act
-        //    var actionResult = userController.DeleteMarque(1).Result;
+            // Assert
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
+        }
 
-        //    // Assert
-        //    Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
-        //}
+        [TestMethod]
+        public void PostMarque_ModelValidated_CreationOK_AvecMoq()
+        {
+            // Arrange
+            var mockRepository = new Mock<IDataRepository<Marque>>();
+            var userController = new MarquesController(mockRepository.Object , dataDPO);
 
-        //[TestMethod]
-        //public async Task PutMarque_ModelValidated_UpdateOK_AvecMoq()
-        //{
-        //    // Arrange
-        //    Marque userAMaJ = new Marque
-        //    {
-        //        IdMarque = 1,   // Initialiser l'ID du Marque à mettre à jour
-        //        NomMarque = "SVG",
+            Marque user = new Marque
+            {
+                NomMarque = "SVG"
+            };
+
+            // Act
+            var actionResult = userController.PostMarque(user).Result;
+
+            // Assert
+            Assert.IsInstanceOfType(actionResult, typeof(ActionResult<Marque>), "Pas un ActionResult<Marque>");
+            Assert.IsInstanceOfType(actionResult.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
+            var result = actionResult.Result as CreatedAtActionResult;
+            Assert.IsInstanceOfType(result.Value, typeof(Marque), "Pas un Marque");
+            user.IdMarque = ((Marque)result.Value).IdMarque;
+            Assert.AreEqual(user, (Marque)result.Value, "Marques pas identiques");
+        }
+
+        [TestMethod]
+        public void DeleteMarqueTest_AvecMoq()
+        {
+            // Arrange
+            Marque user = new Marque
+            {
+                NomMarque = "SVG",
+            };
+
+            var mockRepository = new Mock<IDataRepository<Marque>>();
+            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(user);
+            var userController = new MarquesController(mockRepository.Object , dataDPO);
+
+            // Act
+            var actionResult = userController.DeleteMarque(1).Result;
+
+            // Assert
+            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+        }
+
+        [TestMethod]
+        public async Task PutMarque_ModelValidated_UpdateOK_AvecMoq()
+        {
+            // Arrange
+            Marque userAMaJ = new Marque
+            {
+                IdMarque = 1,   // Initialiser l'ID du Marque à mettre à jour
+                NomMarque = "SVG",
         
-        //    };
+            };
 
-        //    Marque userUpdated = new Marque
-        //    {
-        //        IdMarque = 1,   // Assurez-vous que l'ID correspond à celui que vous souhaitez mettre à jour
-        //        NomMarque = "SV",
-               
-        //    };
+            Marque userUpdated = new Marque
+            {
+                IdMarque = 1,   // Assurez-vous que l'ID correspond à celui que vous souhaitez mettre à jour
+                NomMarque = "SV",
+             
+            };
 
-        //    // Simuler le repository avec Moq
-        //    var mockRepository = new Mock<IDataRepository<Marque>>();
+            // Simuler le repository avec Moq
+            var mockRepository = new Mock<IDataRepository<Marque>>();
 
-        //    // Simuler la méthode GetByIdAsync pour retourner le Marque à mettre à jour
-        //    mockRepository.Setup(x => x.GetByIdAsync(userAMaJ.IdMarque)).ReturnsAsync(userAMaJ);
+            // Simuler la méthode GetByIdAsync pour retourner le Marque à mettre à jour
+            mockRepository.Setup(x => x.GetByIdAsync(userAMaJ.IdMarque)).ReturnsAsync(userAMaJ);
 
-        //    // Simuler la méthode UpdateAsync avec deux paramètres
-        //    mockRepository.Setup(x => x.UpdateAsync(userAMaJ, userUpdated)).Returns(Task.CompletedTask);
+            // Simuler la méthode UpdateAsync avec deux paramètres
+            mockRepository.Setup(x => x.UpdateAsync(userAMaJ, userUpdated)).Returns(Task.CompletedTask);
 
-        //    // Créer le contrôleur avec le mock du repository
-        //    var userController = new MarquesController(mockRepository.Object);
+            // Créer le contrôleur avec le mock du repository
+            var userController = new MarquesController(mockRepository.Object , dataDPO);
 
-        //    // Act
-        //    var actionResult = await userController.PutMarque(userUpdated.IdMarque, userUpdated);
+            // Act
+            var actionResult = await userController.PutMarque(userUpdated.IdMarque, userUpdated);
 
-        //    // Assert
-        //    // Vérifier que la méthode UpdateAsync a bien été appelée avec les bons paramètres
-        //    mockRepository.Verify(x => x.UpdateAsync(userAMaJ, userUpdated), Times.Once);
+            // Assert
+            // Vérifier que la méthode UpdateAsync a bien été appelée avec les bons paramètres
+            mockRepository.Verify(x => x.UpdateAsync(userAMaJ, userUpdated), Times.Once);
 
-        //    // Vérifier que le retour est bien un NoContentResult, ce qui signifie que la mise à jour a réussi
-        //    Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
-        //}
-
-
-
-        //#endregion
-
-        //#region Test de DTO
+            // Vérifier que le retour est bien un NoContentResult, ce qui signifie que la mise à jour a réussi
+            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
+        }
 
 
-        //#endregion
+
+        #endregion
+
+        #region Test de DTO
+
+
+        #endregion
     }
 }

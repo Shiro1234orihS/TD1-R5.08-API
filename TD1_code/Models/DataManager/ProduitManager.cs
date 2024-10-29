@@ -55,6 +55,8 @@ namespace TD1_code.Models.DataManager
             return produitDtos;
         }
 
+
+
         public async Task<ProduitDetailDto> GetByIdAsyncProduitDetailDto(int id)
         {
             var produit = await dBContext.Produits

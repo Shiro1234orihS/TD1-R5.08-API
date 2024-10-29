@@ -1,11 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using TD1_code.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using TD1_code.Models.DataManager;
@@ -13,6 +6,7 @@ using TD1_code.Models.EntityFramework;
 using TD1_code.Respository;
 using TD1_code.Models.AutoMapper;
 using AutoMapper;
+using TD1_code.Models.DTO;
 
 namespace TD1_code.Controllers.Tests
 {
@@ -24,6 +18,8 @@ namespace TD1_code.Controllers.Tests
         private DBContexte context;
         private IDataRepository<Produit> dataRepository;
         private IDataDtoProduit dataDPO;
+        private MapperConfiguration config;
+        private IMapper _mapper;
         #endregion
 
         [TestInitialize]
@@ -39,7 +35,7 @@ namespace TD1_code.Controllers.Tests
                 cfg.AddProfile(new MapperMarque());
             });
 
-            IMapper _mapper = config.CreateMapper();
+            _mapper = config.CreateMapper();
             dataRepository = new ProduitManager(context, _mapper);
 
             // Instanciation correcte de dataDPO
@@ -87,6 +83,105 @@ namespace TD1_code.Controllers.Tests
             Assert.IsInstanceOfType(result, typeof(ActionResult<Produit>), "Pas un ActionResult");
             Assert.IsNull(result.Value, "Produit pas null");
         }
+
+        [TestMethod]
+        public async Task GetDpoProduit_ReturnsRightItem()
+        {
+            // Arrange
+            var produits = await context.Produits
+                                         .Include(p => p.IdTypeProduitNavigation)
+                                         .Include(p => p.IdMarqueNavigation)
+                                         .ToListAsync();
+
+            IEnumerable<ProduitDto> produitDtos = _mapper.Map<IEnumerable<ProduitDto>>(produits);
+
+            // Act
+            var result = await controller.GetDpoProduit();
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult), "Le résultat n'est pas un OkObjectResult.");
+            var okResult = result.Result as OkObjectResult;
+            Assert.IsNotNull(okResult.Value, "La liste des produits renvoyée est null.");
+
+            var actual = okResult.Value as IEnumerable<ProduitDto>;
+            Assert.IsNotNull(actual, "La liste des produits renvoyée est null.");
+
+            // Comparaison
+            var expected = produitDtos.Select(dto => new { dto.Id, dto.Nom }).ToList();
+            var actualList = actual.Select(dto => new { dto.Id, dto.Nom }).ToList();
+            CollectionAssert.AreEqual(expected, actualList, "Les produits ne correspondent pas.");
+        }
+
+        [TestMethod]
+        public async Task GetDpoProduit_ReturnsNotFound_MOQ()
+        {
+            // Arrange
+            var mockDataDPO = new Mock<IDataDtoProduit>();
+            mockDataDPO.Setup(dpo => dpo.GetAllAsyncProduitDto()).ReturnsAsync(new List<ProduitDto>()); // Renvoie une liste vide
+
+            var controller = new ProduitsController(dataRepository, mockDataDPO.Object);
+
+            // Act
+            var result = await controller.GetDpoProduit();
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(NotFoundResult), "Le résultat n'est pas un NotFoundResult.");
+        }
+
+        [TestMethod]
+        public async Task GetProduitDetailById_ReturnsRightItem()
+        {
+            // Arrange
+            int id = 1;
+
+            // Obtenir le produit attendu depuis le contexte, en incluant les relations nécessaires
+            var produit = await context.Produits
+                                        .Include(p => p.IdTypeProduitNavigation)
+                                        .Include(p => p.IdMarqueNavigation)
+                                        .FirstOrDefaultAsync(p => p.IdProduit == id);
+
+            // S'assurer qu'il y a un produit correspondant
+            Assert.IsNotNull(produit, "Le produit avec l'ID spécifié n'a pas été trouvé.");
+
+            // Mapper le produit vers un DTO attendu
+            ProduitDetailDto expectedProduitDetailDto = new ProduitDetailDto
+            {
+                Id = produit.IdProduit,
+                Nom = produit.NomProduit,
+                Description = produit.Description,
+                Nomphoto = produit.NomPhoto,
+                Uriphoto = produit.UriPhoto,
+                Type = produit.IdTypeProduitNavigation?.NomTypeProduit,  // Assurez-vous que NomTypeProduit est une propriété dans TypeProduit
+                Marque = produit.IdMarqueNavigation?.NomMarque,  // Assurez-vous que NomMarque est une propriété dans Marque
+                Stock = produit.StockReel,
+                EnReappro = produit.StockReel < produit.StockMin
+            };
+
+            // Act
+            var result = await controller.GetProduitDetailById(id);
+
+            // Assert
+            Assert.IsInstanceOfType(result.Result, typeof(OkObjectResult), "Le résultat n'est pas du bon type.");
+
+            // Récupérer l'objet du résultat
+            var okResult = result.Result as OkObjectResult;
+            Assert.IsNotNull(okResult, "Le résultat OkObjectResult est null.");
+
+            var actualProduitDetailDto = okResult.Value as ProduitDetailDto;
+            Assert.IsNotNull(actualProduitDetailDto, "Le DTO du produit est null.");
+
+            // Vérifier les valeurs de chaque propriété dans l'objet retourné
+            Assert.AreEqual(expectedProduitDetailDto.Id, actualProduitDetailDto.Id, "L'ID ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Nom, actualProduitDetailDto.Nom, "Le nom du produit ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Description, actualProduitDetailDto.Description, "La description ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Nomphoto, actualProduitDetailDto.Nomphoto, "Le nom de la photo ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Uriphoto, actualProduitDetailDto.Uriphoto, "L'URI de la photo ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Type, actualProduitDetailDto.Type, "Le type de produit ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Marque, actualProduitDetailDto.Marque, "La marque du produit ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.Stock, actualProduitDetailDto.Stock, "Le stock ne correspond pas.");
+            Assert.AreEqual(expectedProduitDetailDto.EnReappro, actualProduitDetailDto.EnReappro, "L'état de réapprovisionnement ne correspond pas.");
+        }
+
 
         [TestMethod]
         public async Task PostProduit_ModelValidated_CreationOK()
