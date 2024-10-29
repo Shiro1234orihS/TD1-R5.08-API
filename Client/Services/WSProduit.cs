@@ -37,6 +37,18 @@ public class WSProduit : IService
             return null;
         }
     }
+    public async Task<List<ProduitDTO>> GetProduitsDTOAsync(string nomControleur)
+    {
+        try
+        {
+            return await Client.GetFromJsonAsync<List<ProduitDTO>>(nomControleur);
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or throw
+            return null;
+        }
+    }
 
     public async Task<bool> PostProduitAsync(string nomControleur, Produit produit)
     {
