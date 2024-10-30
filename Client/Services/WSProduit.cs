@@ -74,4 +74,16 @@ public class WSProduit : IService
         var response = await Client.PutAsJsonAsync(String.Concat(nomControler, "/", idToEdit), produit);
         return response.IsSuccessStatusCode;
     }
+    public async Task<ProduitDetailDto> GetProduitAsync2(string nomControleur, int produitId)
+    {
+        try
+        {
+            return await Client.GetFromJsonAsync<ProduitDetailDto>(String.Concat(nomControleur, "/", produitId));
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or throw
+            return null;
+        }
+    }
 }
