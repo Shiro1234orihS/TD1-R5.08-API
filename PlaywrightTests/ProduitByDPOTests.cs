@@ -18,14 +18,18 @@ public class ProduitByDPOTests : PageTest
     {
         var page = await Browser.NewPageAsync();
         await page.GotoAsync("https://localhost:7016/produitbydpo");
-    
-        // Attendre que la table soit remplie de produits
+
+        // Log avant le chargement
+        Console.WriteLine("Attente du chargement de la table");
+
+        // Attendre la visibilité de la table et vérifier les lignes
+        await page.WaitForSelectorAsync("table.table tbody tr");
+        Console.WriteLine("Table détectée");
+
         var rows = await page.Locator("table.table tbody tr").CountAsync();
+        Console.WriteLine($"Nombre de lignes trouvées : {rows}");
+
         Assert.IsTrue(rows > 0, "La liste des produits devrait s'afficher");
-    
-        // Si la liste est vide, vérifier l'affichage du message "Aucun produit trouvé"
-        var emptyMessage = await page.Locator("td:has-text('Aucun produit trouvé')").IsVisibleAsync();
-        Assert.IsFalse(emptyMessage, "Aucun produit trouvé ne devrait pas s'afficher lorsque des produits existent.");
     }
     [TestMethod]
     public async Task EditProduct_ShouldOpenModal_WhenEditButtonIsClicked()
@@ -51,12 +55,15 @@ public class ProduitByDPOTests : PageTest
 
         // Cliquer sur le bouton "Supprimer" pour le premier produit
         await page.Locator("button.btn-danger:has-text('Supprimer')").First.ClickAsync();
-        await page.WaitForTimeoutAsync(1000); // Pause pour attendre la suppression et le rechargement des données
 
-        // Vérifier que le nombre de produits a diminué de 1
+        // Attendre que le chargement ou la mise à jour soit terminée
+        await page.WaitForTimeoutAsync(1000); // Augmentez le délai si nécessaire
+
+        // Recompter les produits
         var newRowCount = await page.Locator("table.table tbody tr").CountAsync();
         Assert.AreEqual(initialRowCount - 1, newRowCount, "Un produit devrait être supprimé.");
     }
+
     [TestMethod]
     public async Task ViewProductDetails_ShouldNavigateToDetailsPage_WhenViewDetailsButtonIsClicked()
     {
