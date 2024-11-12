@@ -1,0 +1,9 @@
+﻿Creation de la solutoin: 
+dotnet new nunit -n PlaywrightTests
+cd PlaywrightTests
+
+Installation des dépendances Playwright:
+dotnet add package Microsoft.Playwright.MSTest
+
+Installation des navigateurs requis :
+powershell bin/Debug/net8.0/playwright.ps1 install

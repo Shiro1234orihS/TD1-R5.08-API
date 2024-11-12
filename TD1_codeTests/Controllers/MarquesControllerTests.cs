@@ -33,7 +33,7 @@ namespace TD1_code.Controllers.Tests
         public void Init()
         {
             var builder = new DbContextOptionsBuilder<DBContexte>()
-                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=Ricardo2003@");
+                .UseNpgsql("Server=localhost;port=5432;Database=TD1_cod; uid=postgres; password=postgres");
             context = new DBContexte(builder.Options);
 
             var config = new MapperConfiguration(cfg =>
