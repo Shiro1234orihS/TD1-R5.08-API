@@ -46,19 +46,29 @@ namespace PlaywrightTests
             var page = await Browser.NewPageAsync();
             await page.GotoAsync("https://localhost:7016/produitbydpo");
 
+            // Attendre que la table soit visible et chargée
+            await page.WaitForSelectorAsync("table.table tbody tr");
+
             // Compter le nombre initial de produits
             var initialRowCount = await page.Locator("table.table tbody tr").CountAsync();
 
-            // Cliquer sur le bouton "Supprimer" pour le premier produit
-            await page.Locator("button.btn-danger:has-text('Supprimer')").First.ClickAsync();
+            // Vérifier si le bouton "Supprimer" est visible
+            var deleteButton = page.Locator("button.btn-danger:has-text('Supprimer')").First;
 
-            // Attendre que le chargement ou la mise à jour soit terminée
-            await page.WaitForTimeoutAsync(1000);
+            // Cliquer sur le bouton "Supprimer" pour le premier produit
+            await deleteButton.ClickAsync();
+
+            // Attendre la disparition de la ligne supprimée dans le tableau
+            await page.WaitForSelectorAsync("table.table tbody tr", new FrameWaitForSelectorOptions { State = WaitForSelectorState.Detached });
 
             // Recompter les produits
             var newRowCount = await page.Locator("table.table tbody tr").CountAsync();
+
             Assert.AreEqual(initialRowCount - 1, newRowCount, "Un produit devrait être supprimé.");
         }
+
+
+
 
         [TestMethod]
         public async Task EditProduct_SaveChanges_ShouldUpdateProductDetails()
