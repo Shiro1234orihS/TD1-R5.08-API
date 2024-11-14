@@ -41,7 +41,6 @@ namespace TD1_code.Controllers
 
             if (typeProduit == null)
             {
-                //return NotFound("Erreur : La TypeProduit avec cet ID n'a pas été trouvé. Veuillez vérifier l'URL ou les attributs fournis. Détails : " + ModelState);
                 return NotFound();
             }
             return typeProduit;

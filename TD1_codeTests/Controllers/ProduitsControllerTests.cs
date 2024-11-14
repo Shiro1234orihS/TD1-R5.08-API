@@ -65,13 +65,14 @@ namespace TD1_code.Controllers.Tests
         [TestMethod]
         public async Task GetProduitById_ExistingIdPassed_ReturnsRightItem()
         {
-            var result = await controller.GetproduitById(1);
+            int id = 3;
+            var result = await controller.GetproduitById(id);
 
             Assert.IsInstanceOfType(result, typeof(ActionResult<Produit>), "Pas un ActionResult");
             var actionResult = result as ActionResult<Produit>;
             Assert.IsNotNull(actionResult);
             Assert.IsNotNull(actionResult.Value);
-            Assert.AreEqual(context.Produits.FirstOrDefault(c => c.IdProduit == 1),
+            Assert.AreEqual(context.Produits.FirstOrDefault(c => c.IdProduit == id),
                 actionResult.Value, "Produits pas identiques");
         }
 
@@ -132,7 +133,7 @@ namespace TD1_code.Controllers.Tests
         public async Task GetProduitDetailById_ReturnsRightItem()
         {
             // Arrange
-            int id = 1;
+            int id = 3;
 
             // Obtenir le produit attendu depuis le contexte, en incluant les relations nécessaires
             var produit = await context.Produits
@@ -196,7 +197,7 @@ namespace TD1_code.Controllers.Tests
                 Description = "test",
                 NomPhoto = "test",
                 UriPhoto = "test",
-                IdTypeProduit = 1,
+                IdTypeProduit = 2,
                 IdMarque = 1,
                 StockReel = 0,
                 StockMin = 0,
@@ -249,7 +250,7 @@ namespace TD1_code.Controllers.Tests
                 Description = "DescriptionInitiale",
                 NomPhoto = "PhotoInitiale",
                 UriPhoto = "UriInitiale",
-                IdTypeProduit = 1,
+                IdTypeProduit = 2,
                 IdMarque = 1,
                 StockReel = 0,
                 StockMin = 0,
@@ -295,30 +296,33 @@ namespace TD1_code.Controllers.Tests
         [TestMethod]
         public async Task DeleteProduitTest()
         {
-            var rnd = new Random();
+            // Arrange
+            Random rnd = new Random();
             int id = rnd.Next(200, 1000);
             var ProduitASuppr = new Produit
             {
                 IdProduit = id,
-                NomProduit = "test",
-                Description = "test",
-                NomPhoto = "test",
-                UriPhoto = "test",
-                IdTypeProduit = 1,
-                IdMarque = 1,
-                StockReel = 0,
-                StockMin = 0,
-                StockMax = 0
+                NomProduit = "ProduitMisAJour",
+                Description = "DescriptionMisAJour",
+                NomPhoto = "PhotoMisAJour",
+                UriPhoto = "UriMisAJour",
+                IdTypeProduit = 2,
+                IdMarque = 2,
+                StockReel = 10,
+                StockMin = 5,
+                StockMax = 15
             };
 
             context.Produits.Add(ProduitASuppr);
             await context.SaveChangesAsync();
-            ProduitASuppr.IdProduit = context.Produits.FirstOrDefault(c => c.IdProduit == ProduitASuppr.IdProduit).IdProduit;
+            ProduitASuppr.IdProduit = context.Produits.Where(c => c.IdProduit == ProduitASuppr.IdProduit).FirstOrDefault().IdProduit;
 
+            // Act
             var result = await controller.DeleteProduit(ProduitASuppr.IdProduit);
 
+            // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "Pas un NoContentResult");
-            Assert.IsNull(context.Produits.FirstOrDefault(c => c.IdProduit == ProduitASuppr.IdProduit));
+            Assert.IsNull(context.Produits.Where(c => c.IdProduit == ProduitASuppr.IdProduit).FirstOrDefault());
         }
 
         #endregion

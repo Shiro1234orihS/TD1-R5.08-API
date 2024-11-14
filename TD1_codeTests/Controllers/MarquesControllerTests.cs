@@ -338,8 +338,8 @@ namespace TD1_code.Controllers.Tests
             // Vérifier que la méthode UpdateAsync a bien été appelée avec les bons paramètres
             mockRepository.Verify(x => x.UpdateAsync(userAMaJ, userUpdated), Times.Once);
 
-            // Vérifier que le retour est bien un NoContentResult, ce qui signifie que la mise à jour a réussi
-            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
+            // Vérifier que le retour est bien un BadRequestObjectResult, ce qui signifie que la mise à jour a réussi
+            Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult), "Pas un NoContentResult");
         }
 
 

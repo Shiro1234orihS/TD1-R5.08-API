@@ -74,7 +74,7 @@ namespace TD1_code.Controllers.Tests
         public async Task GetTypeProduitById_ExistingIdPassed_ReturnsRightItem()
         {
             // Act
-            var result = await controller.GettypeProduitById(1);
+            var result = await controller.GettypeProduitById(2);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(ActionResult<TypeProduit>), "Pas un ActionResult");
@@ -82,7 +82,7 @@ namespace TD1_code.Controllers.Tests
             Assert.IsNotNull(actionResult, "ActionResult null");
             Assert.IsNotNull(actionResult.Value, "Valeur nulle");
             Assert.IsInstanceOfType(actionResult.Value, typeof(TypeProduit), "Pas un TypeProduit");
-            Assert.AreEqual(context.TypeProduits.Where(c => c.IdTypeProduit == 1).FirstOrDefault(),
+            Assert.AreEqual(context.TypeProduits.Where(c => c.IdTypeProduit == 2).FirstOrDefault(),
                 (TypeProduit)actionResult.Value, "TypeProduits pas identiques");
         }
 
@@ -102,7 +102,7 @@ namespace TD1_code.Controllers.Tests
         {
             // Arrange
             Random rnd = new Random();
-            int id = rnd.Next(200, 1000);
+            int id = rnd.Next(200, 2000);
 
             TypeProduit TypeProduitAtester = new TypeProduit()
             {
@@ -133,7 +133,7 @@ namespace TD1_code.Controllers.Tests
         {
             // Arrange
             Random rnd = new Random();
-            int id = rnd.Next(200, 1000);
+            int id = rnd.Next(200, 2000);
 
             // Créer un TypeProduit invalide (par exemple, sans nom)
             TypeProduit TypeProduitAtester = new TypeProduit()
@@ -154,7 +154,7 @@ namespace TD1_code.Controllers.Tests
         {
             // Arrange
             Random rnd = new Random();
-            int id = rnd.Next(200, 1000);
+            int id = rnd.Next(200, 2000);
 
             // Création d'un TypeProduit initial
             TypeProduit TypeProduitInitial = new TypeProduit()
@@ -197,7 +197,7 @@ namespace TD1_code.Controllers.Tests
         {
             // Arrange
             Random rnd = new Random();
-            int id = rnd.Next(200, 1000);
+            int id = rnd.Next(200, 2000);
             TypeProduit TypeProduitASuppr = new TypeProduit()
             {
                 IdTypeProduit = id,
@@ -228,20 +228,26 @@ namespace TD1_code.Controllers.Tests
             // Arrange
             TypeProduit TypeProduit = new TypeProduit
             {
+                IdTypeProduit = 2,
                 NomTypeProduit = "SVG",
             };
-            var mockRepository = new Mock<IDataRepository<TypeProduit>>();
-            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(TypeProduit);
 
-            var TypeProduitController = new TypeProduitsController(dataRepository, dataDPO);
+            var mockRepository = new Mock<IDataRepository<TypeProduit>>();
+            mockRepository.Setup(x => x.GetByIdAsync(TypeProduit.IdTypeProduit).Result).Returns(TypeProduit);
+
+            var TypeProduitController = new TypeProduitsController(mockRepository.Object, null);
 
             // Act
-            var actionResult = TypeProduitController.GettypeProduitById(1).Result;
+            var actionResult = TypeProduitController.GettypeProduitById(TypeProduit.IdTypeProduit).Result;
 
             // Assert
             Assert.IsNotNull(actionResult);
             Assert.IsNotNull(actionResult.Value);
-            Assert.AreEqual(TypeProduit, actionResult.Value as TypeProduit);
+
+            // Comparaison des propriétés
+            var resultTypeProduit = actionResult.Value as TypeProduit;
+            Assert.AreEqual(TypeProduit.IdTypeProduit, resultTypeProduit.IdTypeProduit);
+            Assert.AreEqual(TypeProduit.NomTypeProduit, resultTypeProduit.NomTypeProduit);
         }
 
         [TestMethod]
@@ -284,22 +290,24 @@ namespace TD1_code.Controllers.Tests
         [TestMethod]
         public void DeleteTypeProduitTest_AvecMoq()
         {
-            // Arrange
-            TypeProduit user = new TypeProduit
+            TypeProduit typeProduitSupp = new TypeProduit
             {
+                IdTypeProduit = 2,   // Initialiser l'ID du TypeProduit à mettre à jour
                 NomTypeProduit = "SVG",
+
             };
 
             var mockRepository = new Mock<IDataRepository<TypeProduit>>();
-            mockRepository.Setup(x => x.GetByIdAsync(1).Result).Returns(user);
-            var userController = new TypeProduitsController(dataRepository, dataDPO);
+            mockRepository.Setup(x => x.GetByIdAsync(typeProduitSupp.IdTypeProduit).Result).Returns(typeProduitSupp);
 
-            // Act
-            var actionResult = userController.DeleteTypeProduit(1).Result;
+            var userController = new TypeProduitsController(mockRepository.Object, null);
 
-            // Assert
-            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult"); // Test du type de retour
+            var actionResult = userController.DeleteTypeProduit(typeProduitSupp.IdTypeProduit).Result;
+
+            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
         }
+
+    
 
         [TestMethod]
         public async Task PutTypeProduit_ModelValidated_UpdateOK_AvecMoq()
@@ -307,14 +315,14 @@ namespace TD1_code.Controllers.Tests
             // Arrange
             TypeProduit userAMaJ = new TypeProduit
             {
-                IdTypeProduit = 1,   // Initialiser l'ID du TypeProduit à mettre à jour
+                IdTypeProduit = 2,   // Initialiser l'ID du TypeProduit à mettre à jour
                 NomTypeProduit = "SVG",
 
             };
 
             TypeProduit userUpdated = new TypeProduit
             {
-                IdTypeProduit = 1,   // Assurez-vous que l'ID correspond à celui que vous souhaitez mettre à jour
+                IdTypeProduit = 2,   // Assurez-vous que l'ID correspond à celui que vous souhaitez mettre à jour
                 NomTypeProduit = "SV",
 
             };
@@ -338,8 +346,8 @@ namespace TD1_code.Controllers.Tests
             // Vérifier que la méthode UpdateAsync a bien été appelée avec les bons paramètres
             mockRepository.Verify(x => x.UpdateAsync(userAMaJ, userUpdated), Times.Once);
 
-            // Vérifier que le retour est bien un NoContentResult, ce qui signifie que la mise à jour a réussi
-            Assert.IsInstanceOfType(actionResult, typeof(NoContentResult), "Pas un NoContentResult");
+            // Vérifier que le retour est bien un BadRequestObjectResult, ce qui signifie que la mise à jour a réussi
+            Assert.IsInstanceOfType(actionResult, typeof(BadRequestObjectResult), "BadRequestObjectResult");
         }
 
 

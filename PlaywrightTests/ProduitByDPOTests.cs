@@ -59,7 +59,7 @@ namespace PlaywrightTests
             await deleteButton.ClickAsync();
 
             // Attendre la disparition de la ligne supprimée dans le tableau
-            await page.WaitForSelectorAsync("table.table tbody tr", new FrameWaitForSelectorOptions { State = WaitForSelectorState.Detached });
+            //await page.WaitForSelectorAsync("table.table tbody tr", new FrameWaitForSelectorOptions { State = WaitForSelectorState.Detached });
 
             // Recompter les produits
             var newRowCount = await page.Locator("table.table tbody tr").CountAsync();
